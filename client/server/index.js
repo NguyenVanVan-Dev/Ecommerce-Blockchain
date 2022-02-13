@@ -3,6 +3,8 @@ const app = express()
 const port = 2105
 const route = require('./src/routes');
 
+const db = require('./src/app/config/database');
+db.connect();
 route(app);
 
 
