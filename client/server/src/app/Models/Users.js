@@ -9,17 +9,17 @@ const userSchema = new Schema({
     phone:{ 
         type: String,
         min: 9,
-        required:true
+        required:true 
     },
     email:{
         type: String,
         max:255,
-        required:true
+        required:true 
     },
     password:{
         type:String,
         min:8,
-        required:true,
+        required:true 
     }
     
 },{

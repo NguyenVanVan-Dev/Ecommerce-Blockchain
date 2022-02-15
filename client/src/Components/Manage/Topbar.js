@@ -1,5 +1,5 @@
 import React from "react";
-
+import {  Link } from "react-router-dom";
 const Topbar = () =>{
     return (
             <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
@@ -155,10 +155,10 @@ const Topbar = () =>{
                     </a>
                     {/* Dropdown - User Information */}
                     <div className="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                        <a className="dropdown-item" href="#">
-                        <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400" />
-                        Profile
-                        </a>
+                        <Link className="dropdown-item" to="/admin/profile">
+                            <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400" />
+                            Profile
+                        </Link>
                         <a className="dropdown-item" href="#">
                         <i className="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400" />
                         Settings

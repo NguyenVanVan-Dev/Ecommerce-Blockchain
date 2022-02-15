@@ -4,10 +4,10 @@ import axios  from "axios";
 import Notiflix from 'notiflix';
 const Register = () =>{
     let navigate = useNavigate();
-    useEffect(() => {
-        if ( localStorage.getItem('auth_token')) return navigate('/');
-        return; 
-    }, []);
+    // useEffect(() => {
+    //     if ( localStorage.getItem('auth__admin_token')) return navigate('/admin/dashboard');
+    //     return; 
+    // }, []);
     const [registerInput, setRegisterInput] = useState({
         name:'',
         email:'',
@@ -29,12 +29,13 @@ const Register = () =>{
             phone:registerInput.phone
         };
         axios.post('/admin/register',data).then(res =>{
-            if(res.data.status == 200){
-                localStorage.setItem('auth_name',res.data.username);
-                localStorage.setItem('auth_token',res.data.token);
+            console.log(res)
+            if(res.data.success == true ){
+                localStorage.setItem('auth_admin_name',res.data.info.name);
+                localStorage.setItem('auth__admin_token',res.data.accessToken);
                 setRegisterInput({...registerInput,error_list:[]});
-                Notiflix.Report.success(res.data.message, '"Welcome to Race-Laravel."<br/><br/>-Vấn Nguyễn', 'Cancel');
-                navigate('/');
+                Notiflix.Report.success(res.data.message, `"Welcome to Ecommerce Blockchain ."<br/><br/>-${res.data.info.name}`, 'Cancel');
+                navigate('/admin/dashboard');
             }
             else 
             {
@@ -59,22 +60,22 @@ const Register = () =>{
                         <div className="form-group row">
                             <div className="col-sm-6 mb-3 mb-sm-0">
                                 <input type="text" onChange={handleInput} value={registerInput.name} name="name" className="form-control form-control-user" id="exampleFirstName" placeholder="Your Name" />
-                                <span className="text-danger small">{registerInput.error_list.name}</span>
+                                {/* <span className="text-danger small">{registerInput.error_list.name}</span> */}
                             </div>
                             <div className="col-sm-6">
                                 <input type="text" onChange={handleInput} value={registerInput.phone} name="phone" className="form-control form-control-user"  placeholder="Number Phone" />
-                                <span className="text-danger small">{registerInput.error_list.phone}</span>
+                                {/* <span className="text-danger small">{registerInput.error_list.phone}</span> */}
                             </div>
                         </div>
                         <div className="form-group">
                             <input type="email"  onChange={handleInput} value={registerInput.email} name="email" className="form-control form-control-user" id="exampleInputEmail"
                                 placeholder="Email Address"/>
-                            <span className="text-danger small">{registerInput.error_list.email}</span>
+                            {/* <span className="text-danger small">{registerInput.error_list.email}</span> */}
                         </div>
                         <div className="form-group row">
                             <div className="col-sm-6 mb-3 mb-sm-0">
                                 <input type="password" onChange={handleInput} value={registerInput.password} name="password" className="form-control form-control-user" id="exampleInputPassword" placeholder="Password" />
-                                <span className="text-danger small">{registerInput.error_list.password}</span>
+                                {/* <span className="text-danger small">{registerInput.error_list.password}</span> */}
                             </div>
                             <div className="col-sm-6">
                                 <input type="password" onChange={handleInput} value={registerInput.repeatpass} name="repeatpass" className="form-control form-control-user" id="exampleRepeatPassword" placeholder="Repeat Password" />

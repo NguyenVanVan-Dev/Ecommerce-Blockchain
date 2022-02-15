@@ -4,10 +4,10 @@ import axios  from "axios";
 import Notiflix from 'notiflix';
 const Login = () =>{
     let navigate = useNavigate();
-    useEffect(() => {
-        if ( localStorage.getItem('auth_token')) return navigate('/');
-        return; 
-    }, []);
+    // useEffect(() => {
+    //     if ( localStorage.getItem('auth__admin_token')) return navigate('/admin/dashboard');
+    //     return; 
+    // }, []);
     const [loginInput, setLoginInput] = useState({
         email:'',
         password:'',
@@ -22,27 +22,21 @@ const Login = () =>{
             email:loginInput.email,
             password:loginInput.password,
         };
-        axios.get('/sanctum/csrf-cookie').then(response => {
-            axios.post('/api/admin/login',data).then(res =>{
-                if(res.data.status === 200){
-                    setLoginInput({...loginInput,error_list:[]});
-                    localStorage.setItem('auth_name',res.data.username);
-                    localStorage.setItem('auth_token',res.data.token);
-                    Notiflix.Report.success('Login Successfully', '"Welcome to Race-Laravel."<br/><br/>-Vấn Nguyễn', 'Cancel');
-                    navigate('/');
-                }
-                else if(res.data.status === 401)
-                {
-                    Notiflix.Report.failure('Login Failure',"Email or Password Incorrect" , 'Cancel');
-                }
-                else 
-                {
-                    setLoginInput({...loginInput,error_list:res.data.validator_errors});
-                    Notiflix.Report.failure('Login Failure',"Please enter all fields " , 'Cancel');
-                }
+        axios.post('/admin/login',data).then(res =>{
+            if(res.data.success == true ){
+                localStorage.setItem('auth_admin_name',res.data.info.name);
+                localStorage.setItem('auth__admin_token',res.data.accessToken);
+                setLoginInput({...loginInput,error_list:[]});
+                Notiflix.Report.success('Login Successfully', `"Welcome to Race-Laravel."<br/><br/>-${res.data.info.name}`, 'Cancel');
+                navigate('/admin/dashboard');
             }
-            );
-        });
+            else 
+            {
+                setLoginInput({...loginInput,error_list:res.data.validator_errors});
+                Notiflix.Report.failure('Login Failure',"Please enter all fields " , 'Cancel');
+            }
+        }
+        );
     }
     return (   
         <div className="container">
@@ -62,11 +56,11 @@ const Login = () =>{
                             <form className="user">
                             <div className="form-group">
                                 <input type="email" onChange={handleInput} value={loginInput.email}  name="email" className="form-control form-control-user" id="exampleInputEmail" aria-describedby="emailHelp" placeholder="Enter Email Address..." />
-                                <span className="text-danger small">{loginInput.error_list.email}</span>
+                                {/* <span className="text-danger small">{loginInput.error_list ? loginInput.error_list.email : "" }</span> */}
                             </div>
                             <div className="form-group">
                                 <input type="password" onChange={handleInput} value={loginInput.password} name="password" className="form-control form-control-user" id="exampleInputPassword" placeholder="Password" />
-                                <span className="text-danger small">{loginInput.error_list.password}</span>
+                                {/* <span className="text-danger small">{loginInput.error_list ?loginInput.error_list.password : ""}</span> */}
                             </div>
                             <div className="form-group">
                                 <div className="custom-control custom-checkbox small">

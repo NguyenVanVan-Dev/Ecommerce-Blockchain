@@ -1,0 +1,11 @@
+POST   http://localhost:2105/admin/register
+
+"Content-Type": application/json
+
+
+{
+    "name":"Nguyễn Văn Vấn",
+    "password":"naice123456",
+    "email": "nguyenvan@gmail.com",
+    "phone":"239829801831",
+}
