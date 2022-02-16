@@ -1,8 +1,7 @@
 import React from "react";
+import { Outlet } from "react-router-dom";
 import Sidebar from "../../Components/Manage/Sidebar";
 import Topbar from "../../Components/Manage/Topbar";
-import { Outlet } from "react-router-dom";
-
 
 const MasterLayout = () =>{
     return (

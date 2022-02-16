@@ -29,7 +29,6 @@ const Register = () =>{
             phone:registerInput.phone
         };
         axios.post('/admin/register',data).then(res =>{
-            console.log(res)
             if(res.data.success == true ){
                 localStorage.setItem('auth_admin_name',res.data.info.name);
                 localStorage.setItem('auth__admin_token',res.data.accessToken);
@@ -37,11 +36,15 @@ const Register = () =>{
                 Notiflix.Report.success(res.data.message, `"Welcome to Ecommerce Blockchain ."<br/><br/>-${res.data.info.name}`, 'Cancel');
                 navigate('/admin/dashboard');
             }
-            else 
-            {
-                setRegisterInput({...registerInput,error_list:res.data.validator_errors});
-                Notiflix.Report.failure('Register Failure',"Please enter all fields" , 'Cancel');
-            }
+            // else 
+            // {
+            //     console.log(res.data.error);
+            //     setRegisterInput({...registerInput,error_list:res.data.error});
+            //     Notiflix.Report.failure('Register Failure',"Please enter all fields" , 'Cancel');
+            // }
+        })
+        .catch((error)=>{
+            console.log(error);
         });
     }
     return (    

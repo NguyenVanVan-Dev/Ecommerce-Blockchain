@@ -1,10 +1,10 @@
 
 import { Routes, Route, Link ,Navigate} from "react-router-dom";
 
-import Home from "./Components/User/Home";
 import Login from "./Components/Manage/Auth/Login";
 import Register from "./Components/Manage/Auth/Register";
 import MasterLayout from "./Layout/Manage/MasterLayout";
+import MasterLayoutUI from "./Layout/User/MasterLayout";
 import PageContent  from "./Components/Manage/PageContent";
 import axios  from "axios";
 import Profile from "./Components/Manage/Profile";
@@ -24,7 +24,8 @@ function App() {
     return (
         <div className="App">
         <Routes>
-            <Route path="/" element={<Home/>} />
+            {/* <Route path="/" element={<Home/>} /> */}
+            <Route path="/" element={<MasterLayoutUI/>} />
             <Route path="/admin/login" element = {<Login/>} />
             <Route path="/admin/register" element = {<Register/>} />
             <Route path="/admin" element = {<MasterLayout/>} >

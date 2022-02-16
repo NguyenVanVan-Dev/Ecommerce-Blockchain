@@ -4,22 +4,23 @@ const userSchema = new Schema({
     name: { 
         type: String, 
         default: 'Vấn Vip Pro',
-        required:true 
+        required:[true , 'Please enter your name!' ]
     }, 
     phone:{ 
-        type: String,
-        min: 9,
-        required:true 
+        type: Number,
+        min: [10,'invalid phone number'],
+        required:[true , 'Please enter your phone number !' ]
     },
     email:{
         type: String,
         max:255,
-        required:true 
+        unique: true,
+        required:[true , 'Please enter your email account!' ]
     },
     password:{
         type:String,
-        min:8,
-        required:true 
+        min:[8, 'Please enter a password longer than 8 characters!'],
+        required:[true , 'Please enter your password!' ]
     }
     
 },{
