@@ -17,7 +17,7 @@ const LastestSlideProduct = () => {
                             autoplay
                             animateOut={"fadeOut"}
                             smartSpeed= "1200"
-                            autoHeight= "false"
+                         
                         >
                             <div className="latest-prdouct__slider__item">
                                 <a href="#" className="latest-product__item">
@@ -91,7 +91,7 @@ const LastestSlideProduct = () => {
                             autoplay
                             animateOut={"fadeOut"}
                             smartSpeed= "1200"
-                            autoHeight= "false"
+
                         >
                             <div className="latest-prdouct__slider__item">
                                 <a href="#" className="latest-product__item">
@@ -165,7 +165,7 @@ const LastestSlideProduct = () => {
                             autoplay
                             animateOut={"fadeOut"}
                             smartSpeed= "1200"
-                            autoHeight= "false"
+
                         >
                             <div className="latest-prdouct__slider__item">
                                 <a href="#" className="latest-product__item">

@@ -4,10 +4,10 @@ import axios  from "axios";
 import Notiflix from 'notiflix';
 const Login = () =>{
     let navigate = useNavigate();
-    // useEffect(() => {
-    //     if ( localStorage.getItem('auth__admin_token')) return navigate('/admin/dashboard');
-    //     return; 
-    // }, []);
+    useEffect(() => {
+        if ( localStorage.getItem('auth_token')) return navigate('/admin/dashboard');
+        return; 
+    }, []);
     const [loginInput, setLoginInput] = useState({
         email:'',
         password:'',
@@ -24,8 +24,8 @@ const Login = () =>{
         };
         axios.post('/admin/login',data).then(res =>{
             if(res.data.success == true ){
-                localStorage.setItem('auth_admin_name',res.data.info.name);
-                localStorage.setItem('auth__admin_token',res.data.accessToken);
+                localStorage.setItem('auth_name',res.data.info.name);
+                localStorage.setItem('auth_token',res.data.accessToken);
                 setLoginInput({...loginInput,error_list:[]});
                 Notiflix.Report.success('Login Successfully', `"Welcome to Race-Laravel."<br/><br/>-${res.data.info.name}`, 'Cancel');
                 navigate('/admin/dashboard');
@@ -35,8 +35,9 @@ const Login = () =>{
                 setLoginInput({...loginInput,error_list:res.data.validator_errors});
                 Notiflix.Report.failure('Login Failure',"Please enter all fields " , 'Cancel');
             }
-        }
-        );
+        }).catch((error)=>{
+            Notiflix.Report.failure('Login Failure',error.response.data.message, 'Cancel');
+        });
     }
     return (   
         <div className="container">

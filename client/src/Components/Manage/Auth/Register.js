@@ -4,10 +4,10 @@ import axios  from "axios";
 import Notiflix from 'notiflix';
 const Register = () =>{
     let navigate = useNavigate();
-    // useEffect(() => {
-    //     if ( localStorage.getItem('auth__admin_token')) return navigate('/admin/dashboard');
-    //     return; 
-    // }, []);
+    useEffect(() => {
+        if ( localStorage.getItem('auth_token')) return navigate('/admin/dashboard');
+        return; 
+    }, []);
     const [registerInput, setRegisterInput] = useState({
         name:'',
         email:'',
@@ -17,7 +17,6 @@ const Register = () =>{
         error_list:[],
     })
     const handleInput = (e)=>{
-        // e.presist();
         setRegisterInput({...registerInput,[e.target.name]: e.target.value})
     }
     const handelSubmit =(e)=>{
@@ -30,21 +29,17 @@ const Register = () =>{
         };
         axios.post('/admin/register',data).then(res =>{
             if(res.data.success == true ){
-                localStorage.setItem('auth_admin_name',res.data.info.name);
-                localStorage.setItem('auth__admin_token',res.data.accessToken);
+                localStorage.setItem('auth_name',res.data.info.name);
+                localStorage.setItem('auth_token',res.data.accessToken);
                 setRegisterInput({...registerInput,error_list:[]});
                 Notiflix.Report.success(res.data.message, `"Welcome to Ecommerce Blockchain ."<br/><br/>-${res.data.info.name}`, 'Cancel');
                 navigate('/admin/dashboard');
             }
-            // else 
-            // {
-            //     console.log(res.data.error);
-            //     setRegisterInput({...registerInput,error_list:res.data.error});
-            //     Notiflix.Report.failure('Register Failure',"Please enter all fields" , 'Cancel');
-            // }
         })
         .catch((error)=>{
-            console.log(error);
+            setRegisterInput((prev)=>{
+                return {...prev,error_list: error.response.data.listError}
+            });
         });
     }
     return (    
@@ -63,17 +58,17 @@ const Register = () =>{
                         <div className="form-group row">
                             <div className="col-sm-6 mb-3 mb-sm-0">
                                 <input type="text" onChange={handleInput} value={registerInput.name} name="name" className="form-control form-control-user" id="exampleFirstName" placeholder="Your Name" />
-                                {/* <span className="text-danger small">{registerInput.error_list.name}</span> */}
+                                <span className="text-danger small">{registerInput.error_list.name}</span>
                             </div>
                             <div className="col-sm-6">
                                 <input type="text" onChange={handleInput} value={registerInput.phone} name="phone" className="form-control form-control-user"  placeholder="Number Phone" />
-                                {/* <span className="text-danger small">{registerInput.error_list.phone}</span> */}
+                                <span className="text-danger small">{registerInput.error_list.phone}</span>
                             </div>
                         </div>
                         <div className="form-group">
                             <input type="email"  onChange={handleInput} value={registerInput.email} name="email" className="form-control form-control-user" id="exampleInputEmail"
                                 placeholder="Email Address"/>
-                            {/* <span className="text-danger small">{registerInput.error_list.email}</span> */}
+                            <span className="text-danger small">{registerInput.error_list.email}</span>
                         </div>
                         <div className="form-group row">
                             <div className="col-sm-6 mb-3 mb-sm-0">

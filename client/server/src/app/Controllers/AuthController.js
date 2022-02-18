@@ -11,46 +11,44 @@ class AuthController {
     async register(req,res){ 
         const {name, password, email,phone} = req.body;
         const user = await User.findOne({ email })
-        if(user){
-            return res.status(400).json({success:false, error:{errors:"Email account already in use, please choose another account!"}})
-        } 
-        const hashPassword  = await argon2.hash(password);
-        const registerAdmin  = new User({ 
-            name: name,
-            phone:phone,
-            email:email,
-            password:hashPassword
-        });
-         await  registerAdmin.save()
-                            .then((message)=>{
-                                const {email,name,phone} = message;
-                                const accessToken = jwt.sign({userId: registerAdmin._id}, process.env.ACCESS_TOKEN_SECRET);
-                                res.status(200).json({success:true,message:"Register Successfully ",accessToken,info:{name,email,phone}});
-                            })
-                            .catch((error)=>{
-                                res.status(406).json({success:false,message:"Register Failure!",error});
-                            });
-        // try {
-           
-        // } catch (error) {
-        //     console.log(error.message)
-        //     res.status(500).json({success:false,message:"Internal Server Error"})
-        // }
+       
+        try {
+            if(user){
+                return res.status(400).json({success:false, error:{errors:"Email account already in use, please choose another account!"}})
+            }
+            const hashPassword  = await argon2.hash(password);
+            const registerAdmin  = new User({ 
+                name: name,
+                phone:phone,
+                email:email,
+                password:hashPassword
+            });
+             await  registerAdmin.save()
+                                .then((message)=>{
+                                    const {email,name,phone} = message;
+                                    const accessToken = jwt.sign({userId: registerAdmin._id}, process.env.ACCESS_TOKEN_SECRET);
+                                    res.status(200).json({success:true,message:"Register Successfully ",accessToken,info:{name,email,phone}});
+                                })
+                                .catch((error)=>{
+                                    const listError = {
+                                        name:error.errors.name.message,
+                                        email:error.errors.email.message,
+                                        phone:error.errors.phone.message
+                                    };
+                                    res.status(403).json({success:false,message:"Register Failure!",listError});
+                                });
+        } catch (error) {
+            console.log(error.message)
+            res.status(500).json({success:false,message:"Internal Server Error"})
+        }
     }
     //[POST]  
     //path /admin/login
     //des login admin
     async login (req, res,next){
         const {email, password} = req.body;
-        if(!email || !password){
-            return res.status(400).json({
-                success:false,
-                message:"Missing name or password!"
-            })
-        }
         try {
             const user = await User.findOne({ email })
-            console.log(user);
             if(!user){
                 return res.status(400).json({success:false, message:"Incorret Email or Password!"})
             }
@@ -72,9 +70,11 @@ class AuthController {
                 }
             });
         } catch (error) {
-            console.log(error.message)
             res.status(500).json({success:false,message:"Internal Server Error"})
         }
+    }
+    async logout(req,res){
+        
     }
 }
 
