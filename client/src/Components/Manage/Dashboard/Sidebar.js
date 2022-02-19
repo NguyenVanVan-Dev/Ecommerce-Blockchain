@@ -68,9 +68,9 @@ const Sidebar = () =>{
             </a>
             <div id="collapsePages" className="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
             <div className="bg-white py-2 collapse-inner rounded">
-                <h6 className="collapse-header">Login Screens:</h6>
-                <a className="collapse-item" href="login.html">Login</a>
-                <a className="collapse-item" href="register.html">Register</a>
+                <h6 className="collapse-header">Categories Page:</h6>
+                <Link className="collapse-item" to="add-category">Add Category</Link>
+                <Link className="collapse-item" to="list-category">List Category</Link>
                 <a className="collapse-item" href="forgot-password.html">Forgot Password</a>
                 <div className="collapse-divider" />
                 <h6 className="collapse-header">Other Pages:</h6>

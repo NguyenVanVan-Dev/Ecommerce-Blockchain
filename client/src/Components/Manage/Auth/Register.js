@@ -37,9 +37,12 @@ const Register = () =>{
             }
         })
         .catch((error)=>{
-            setRegisterInput((prev)=>{
-                return {...prev,error_list: error.response.data.listError}
-            });
+            console.log(error.response)
+            if(error.response.data.listError){
+                setRegisterInput((prev)=>{
+                    return {...prev,error_list: error.response.data.listError}
+                });
+            }
         });
     }
     return (    

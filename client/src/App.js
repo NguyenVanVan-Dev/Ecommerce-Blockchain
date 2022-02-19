@@ -5,9 +5,10 @@ import Login from "./Components/Manage/Auth/Login";
 import Register from "./Components/Manage/Auth/Register";
 import MasterLayout from "./Layout/Manage/MasterLayout";
 import MasterLayoutUI from "./Layout/User/MasterLayout";
-import PageContent  from "./Components/Manage/PageContent";
+import Dashboard  from "./Components/Manage/Webpage/Dashboard";
+import Profile from "./Components/Manage/Webpage/Profile";
 import axios  from "axios";
-import Profile from "./Components/Manage/Profile";
+import AddCategory from "./Components/Manage/Webpage/AddCategory";
 axios.defaults.baseURL = 'http://localhost:2105/';
 axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
 axios.defaults.headers.post ['Accept'] = 'application / json';
@@ -29,8 +30,10 @@ function App() {
             <Route path="/admin/login" element = {<Login/>} />
             <Route path="/admin/register" element = {<Register/>} />
             <Route path="/admin" element = {<MasterLayout/>} >
-                <Route path="dashboard" element={<PageContent />} />
+                <Route path="dashboard" element={<Dashboard />} />
                 <Route path="profile" element={<Profile/>} />
+                <Route path="add-category" element={<AddCategory/>} />
+                
             </Route>
         </Routes>
         </div>

@@ -27,13 +27,8 @@ const Login = () =>{
                 localStorage.setItem('auth_name',res.data.info.name);
                 localStorage.setItem('auth_token',res.data.accessToken);
                 setLoginInput({...loginInput,error_list:[]});
-                Notiflix.Report.success('Login Successfully', `"Welcome to Race-Laravel."<br/><br/>-${res.data.info.name}`, 'Cancel');
+                Notiflix.Report.success('Login Successfully', `"Welcome to Ecommerce-BlockChain."<br/><br/>-${res.data.info.name}`, 'Cancel');
                 navigate('/admin/dashboard');
-            }
-            else 
-            {
-                setLoginInput({...loginInput,error_list:res.data.validator_errors});
-                Notiflix.Report.failure('Login Failure',"Please enter all fields " , 'Cancel');
             }
         }).catch((error)=>{
             Notiflix.Report.failure('Login Failure',error.response.data.message, 'Cancel');

@@ -1,8 +1,10 @@
 import React ,{useEffect}from "react";
-import { useNavigate} from "react-router-dom";
-import { Outlet } from "react-router-dom";
-import Sidebar from "../../Components/Manage/Sidebar";
-import Topbar from "../../Components/Manage/Topbar";
+
+import { Outlet,useNavigate } from "react-router-dom";
+import Sidebar from "../../Components/Manage/Dashboard/Sidebar";
+import Topbar from "../../Components/Manage/Dashboard/Topbar";
+import Footer from "../../Components/Manage/Dashboard/Footer";
+import ModalLogout from "../../Components/Manage/Dashboard/ModalLogout";
 
 const MasterLayout = () =>{
     let navigate = useNavigate();
@@ -18,7 +20,9 @@ const MasterLayout = () =>{
                     <Topbar/>
                     <Outlet />
                 </div>
+                <Footer></Footer>
             </div>
+            <ModalLogout></ModalLogout>
         </div>
     )
 }

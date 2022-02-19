@@ -1,6 +1,4 @@
 
-const NewModel = require('../Models/News')
-
 class SiteController {
     // [GET] /
     index (req, res){

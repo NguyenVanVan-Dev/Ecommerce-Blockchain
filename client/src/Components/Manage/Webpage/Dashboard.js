@@ -1,5 +1,5 @@
 import React from "react";
-const PageContent = () =>{
+const Dashboard = () =>{
     return (
         <div className="container-fluid">
             {/* Page Heading */}
@@ -292,4 +292,4 @@ const PageContent = () =>{
     )
 }
 
-export default PageContent;
+export default Dashboard;

@@ -1,12 +1,7 @@
 import React from "react";
 import {  Link ,useNavigate} from "react-router-dom";
 const Topbar = () =>{
-    const navigate = useNavigate();
-    const handleLogout = (e)=>{
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('auth_name');
-            navigate('/admin/login')
-    }
+   
     return (
             <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
                 {/* Sidebar Toggle (Topbar) */}
@@ -174,7 +169,7 @@ const Topbar = () =>{
                         Activity Log
                         </a>
                         <div className="dropdown-divider" />
-                        <div className="dropdown-item"  onClick={handleLogout} data-toggle="modal" data-target="#logoutModal">
+                        <div className="dropdown-item"   data-toggle="modal" data-target="#logoutModal">
                             <i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400" />
                             Logout
                         </div>

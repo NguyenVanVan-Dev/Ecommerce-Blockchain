@@ -11,11 +11,14 @@ class AuthController {
     async register(req,res){ 
         const {name, password, email,phone} = req.body;
         const user = await User.findOne({ email })
-       
+        let listError = {};
         try {
             if(user){
-                return res.status(400).json({success:false, error:{errors:"Email account already in use, please choose another account!"}})
-            }
+                listError ={
+                    email:"Email account already in use, please choose another account!"
+                }
+                return res.status(400).json({success:false, message:"Register Failure!",listError})
+            } 
             const hashPassword  = await argon2.hash(password);
             const registerAdmin  = new User({ 
                 name: name,
@@ -30,10 +33,10 @@ class AuthController {
                                     res.status(200).json({success:true,message:"Register Successfully ",accessToken,info:{name,email,phone}});
                                 })
                                 .catch((error)=>{
-                                    const listError = {
-                                        name:error.errors.name.message,
-                                        email:error.errors.email.message,
-                                        phone:error.errors.phone.message
+                                    listError = {
+                                        name:  error.errors.name ? error.errors.name.message : '',
+                                        email: error.errors.email ? error.errors.email.message : '',
+                                        phone: error.errors.phone ? error.errors.phone.message : '',
                                     };
                                     res.status(403).json({success:false,message:"Register Failure!",listError});
                                 });
