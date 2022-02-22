@@ -6,6 +6,7 @@ router.post('/store',categoryController.store);
 router.get('/show',categoryController.show);
 router.get('/detail',categoryController.detail);
 router.put('/update',categoryController.update);
+router.post('/delete',categoryController.delete);
 
 
 

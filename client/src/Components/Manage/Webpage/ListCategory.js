@@ -1,5 +1,6 @@
 import React,{useEffect, useState} from 'react'
 import {Link,useNavigate} from "react-router-dom";
+import $ from 'jquery'
 import axios  from "axios";
 import Notiflix from 'notiflix';
 const ListCategory = () => {
@@ -14,6 +15,15 @@ const ListCategory = () => {
             Notiflix.Report.failure("Category not Found","please come back later" , 'Cancel');
         })
     },[])
+    const handleRemoveCategory = (id)=>{
+        const data = {id};
+        axios.post('/category/delete',data).then((res)=>{
+            if(res.data.success === true){
+                Notiflix.Report.failure("Delete Category Successfully","Category has been remove from database" , 'Cancel');
+                $('#'+id).remove()
+            }
+        })
+    }
     return (
         <div className="container">
             <div className="card o-hidden border-0 shadow-lg my-5">
@@ -43,7 +53,7 @@ const ListCategory = () => {
                                 <tbody>
                                     {
                                         categories.map((category,index)=>{
-                                            return (<tr key={index} >
+                                            return (<tr key={index} id={category._id}>
                                                 <th scope="row">{index+1}</th>
                                                 <td>{category.name}</td>
                                                 <td>{category.slug}</td>
@@ -52,7 +62,7 @@ const ListCategory = () => {
                                                 <td>{category.keyword}</td>
                                                 <td>
                                                     <Link to={'/admin/category/'+category._id} className="btn btn-info mr-1 mb-1"><i className="fas fa-edit"></i></Link>
-                                                    <button type="button" className="btn btn-danger"><i className="fas fa-trash pr-1"></i></button>
+                                                    <button onClick={()=>{handleRemoveCategory(category._id)}} data-id={category._id} className="btn btn-danger remove_cate"><i className="fas fa-trash pr-1"></i></button>
                                                 </td>
                                             </tr>)
                                         })

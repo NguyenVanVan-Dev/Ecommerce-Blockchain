@@ -94,6 +94,21 @@ class CategoryController {
             res.status(500).json({success:false,message:"Internal Server Error"})
         }
     }
+    async delete(req,res){
+      const  {id} = req.body;
+      if(!id){
+        res.status(403).json({success:false,message:"Delete Category Failure , Infomation not found"});
+      }
+      try {
+        await  categoryModle.deleteOne({ _id: id })
+                            .then((result)=>{
+                                res.status(200).json({success:true,message:"Delete Category Successfully "});
+                            })
+      } catch (error) {
+        console.log(error)
+        res.status(500).json({success:false,message:"Internal Server Error"})
+      }
+    }
 }
 
 
