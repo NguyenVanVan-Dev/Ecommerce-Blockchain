@@ -1,10 +1,11 @@
-import React ,{useState} from "react";
-import {Link} from "react-router-dom";
+import React ,{useLayoutEffect, useState} from "react";
+import {Link,useParams} from "react-router-dom";
 import axios  from "axios";
 import Notiflix from 'notiflix';
-const AddCategory = ()=>{
-    // let navigate = useNavigate();
+function DetailCategory() {
+    const { id } = useParams();
     const [categoryInput, setCategoryInput] = useState({
+        id:id,
         name:'',
         desc:'',
         slug:'',
@@ -12,31 +13,48 @@ const AddCategory = ()=>{
         display:1,
         error_list:[],
     })
+    console.log(categoryInput)
+    useLayoutEffect(()=>{
+        axios.get('/category/detail',{ 
+            params : { 
+              id,
+            } 
+            }).then(res =>{
+            if(res.data.success === true)
+            {
+                setCategoryInput({
+                    ...categoryInput,
+                    name:res.data.category.name,
+                    desc:res.data.category.desc,
+                    slug:res.data.category.slug,
+                    keyword:res.data.category.keyword,
+                    display:res.data.category.display,
+                    error_list:[],
+                });
+               
+            }
+        }).catch((error)=>{
+            Notiflix.Report.failure(error.response.data.message,`No category found with id "${id}" ` , 'Cancel');
+        })
+    },[])
+    
     const handleInput = (e)=>{
         setCategoryInput({...categoryInput,[e.target.name]: e.target.value})
     }
     const handelSubmit = (e)=>{
         e.preventDefault();
         let data ={
+            id:categoryInput.id,
             name:categoryInput.name,
             desc:categoryInput.desc,
             slug:categoryInput.slug,
             keyword:categoryInput.keyword,
-            display:categoryInput.display,
-          
+            display:categoryInput.display, 
         };
-        axios.post('/category/store',data).then(res =>{
+        axios.put('/category/update',data).then(res =>{
             if(res.data.success === true)
             {
-                setCategoryInput({
-                    name:'',
-                    desc:'',
-                    slug:'',
-                    keyword:'',
-                    display:1,
-                    error_list:[],
-                });
-                Notiflix.Report.success(res.data.message,"Catalog has been added to the database" , 'Cancel');
+                Notiflix.Report.success(res.data.message,"Catalog has been updated to the database" , 'Cancel');
             }
         }).catch((error)=>{
             console.log(error.response)
@@ -56,7 +74,7 @@ const AddCategory = ()=>{
                         <div className="col-lg-12">
                             <div className="p-5">
                             <div className="text-center">
-                                <h1 className="h4 text-gray-900 mb-4">Add Category Product</h1>
+                                <h1 className="h4 text-gray-900 mb-4">Edit Category Product</h1>
                             </div>
                             <div className="">
                                 <Link to={'/admin/list-category'} className="btn btn-primary mb-4">List Category</Link>
@@ -96,8 +114,8 @@ const AddCategory = ()=>{
                                     </div>
                                     <div className="form-row mt-5">
                                         <div className="form-group col-md-3">
-                                            <button onClick={handelSubmit} className="btn btn-primary btn-user btn-block">
-                                                  Add Category
+                                            <button onClick={handelSubmit} className="btn btn-info btn-user btn-block">
+                                                  Update Category
                                             </button>
                                         </div>
                                    </div>
@@ -111,4 +129,4 @@ const AddCategory = ()=>{
     )
 }
 
-export default AddCategory;
+export default DetailCategory

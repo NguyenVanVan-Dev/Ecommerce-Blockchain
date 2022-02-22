@@ -9,6 +9,8 @@ import Dashboard  from "./Components/Manage/Webpage/Dashboard";
 import Profile from "./Components/Manage/Webpage/Profile";
 import axios  from "axios";
 import AddCategory from "./Components/Manage/Webpage/AddCategory";
+import ListCategory from "./Components/Manage/Webpage/ListCategory";
+import DetailCategory from "./Components/Manage/Webpage/DetailCategory";
 axios.defaults.baseURL = 'http://localhost:2105/';
 axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
 axios.defaults.headers.post ['Accept'] = 'application / json';
@@ -33,6 +35,8 @@ function App() {
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="profile" element={<Profile/>} />
                 <Route path="add-category" element={<AddCategory/>} />
+                <Route path="list-category" element={<ListCategory/>} />
+                <Route path="category/:id" element={<DetailCategory/>} />
                 
             </Route>
         </Routes>
