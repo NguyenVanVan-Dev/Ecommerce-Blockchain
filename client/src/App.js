@@ -15,13 +15,14 @@ axios.defaults.baseURL = 'http://localhost:2105/';
 axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
 axios.defaults.headers.post ['Accept'] = 'application / json';
 axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+// axios.defaults.headers['authorization'] = 'Beaer ' + localStorage.getItem('auth_token')?? 'jhhhhhhhhhhhhhh';
 
 // axios.defaults.withCredentials = true; // bật cái đầu buồi này lên sẽ bị Cors : localhost:3000 sẽ k gửi request lên localhost:2105 được
-// axios.interceptors.request.use( function(config){
-//     const token = localStorage.getItem('auth_token');
-//     config.headers.Authorization = token ? `Bearer ${token}` : '';
-//     return config;
-// });
+axios.interceptors.request.use( function(config){
+    const token = localStorage.getItem('auth_token');
+    config.headers.Authorization = token ? `Bearer ${token}` : '';
+    return config;
+});
 
 function App() {
     return (

@@ -29,7 +29,7 @@ class AuthController {
              await  registerAdmin.save()
                                 .then((message)=>{
                                     const {email,name,phone} = message;
-                                    const accessToken = jwt.sign({userId: registerAdmin._id}, process.env.ACCESS_TOKEN_SECRET);
+                                    const accessToken = jwt.sign({userId: registerAdmin._id}, process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '3600s'});
                                     res.status(200).json({success:true,message:"Register Successfully ",accessToken,info:{name,email,phone}});
                                 })
                                 .catch((error)=>{
@@ -60,7 +60,7 @@ class AuthController {
                 return res.status(400).json({success:false, message:"Incorret Email or Password!"})
             }
     
-            const accessToken = jwt.sign({userId: user._id},process.env.ACCESS_TOKEN_SECRET);
+            const accessToken = jwt.sign({userId: user._id},process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '6000s'});
     
             res.json({
                 success:true,
