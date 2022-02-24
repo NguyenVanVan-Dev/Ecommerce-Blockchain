@@ -1,11 +1,24 @@
-import React,{ useEffect} from "react";
+import React,{useState, useEffect} from "react";
 import $ from "jquery";
+import axios from 'axios';
+import Notiflix from 'notiflix';
 const SideBarCategory = () =>{
     useEffect(() => {
         $('.hero__categories__all').on('click', function(){
             $('.hero__categories ul').slideToggle(400);
         });
     }, []);
+    const [categories,setCategory] = useState([]);
+    useEffect(()=>{
+        axios.get('/category/show').then((res)=>{
+            if(res.data.success === true){
+                setCategory(res.data.category);
+            }
+        })
+        .catch((error)=>{
+            Notiflix.Report.failure("Category not Found","please come back later" , 'Cancel');
+        })
+    },[])
     return (
         <section className="hero">
             <div className="container">
@@ -17,17 +30,11 @@ const SideBarCategory = () =>{
                     <span>All departments</span>
                     </div>
                     <ul>
-                    <li><a href="#">Fresh Meat</a></li>
-                    <li><a href="#">Vegetables</a></li>
-                    <li><a href="#">Fruit &amp; Nut Gifts</a></li>
-                    <li><a href="#">Fresh Berries</a></li>
-                    <li><a href="#">Ocean Foods</a></li>
-                    <li><a href="#">Butter &amp; Eggs</a></li>
-                    <li><a href="#">Fastfood</a></li>
-                    <li><a href="#">Fresh Onion</a></li>
-                    <li><a href="#">Papayaya &amp; Crisps</a></li>
-                    <li><a href="#">Oatmeal</a></li>
-                    <li><a href="#">Fresh Bananas</a></li>
+                        {categories.map((category,index)=>{
+                            return (
+                                <li key={index}><a href="#">{category.name}</a></li>
+                            )
+                        })}
                     </ul>
                 </div>
                 </div>

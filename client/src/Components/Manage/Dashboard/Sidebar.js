@@ -71,7 +71,10 @@ const Sidebar = () =>{
                 <h6 className="collapse-header">Categories Page:</h6>
                 <Link className="collapse-item" to="add-category">Add Category</Link>
                 <Link className="collapse-item" to="list-category">List Category</Link>
-                <a className="collapse-item" href="forgot-password.html">Forgot Password</a>
+                <div className="collapse-divider" />
+                <h6 className="collapse-header">Products Page:</h6>
+                <Link className="collapse-item" to="add-product">Add Products</Link>
+                <Link className="collapse-item" to="list-product">List Products</Link>
                 <div className="collapse-divider" />
                 <h6 className="collapse-header">Other Pages:</h6>
                 <a className="collapse-item" href="404.html">404 Page</a>

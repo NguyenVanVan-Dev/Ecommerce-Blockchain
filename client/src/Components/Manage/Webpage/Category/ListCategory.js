@@ -6,7 +6,11 @@ import Notiflix from 'notiflix';
 const ListCategory = () => {
     const [categories,setCategory] = useState([]);
     useEffect(()=>{
-        axios.get('/category/show').then((res)=>{
+        axios.get('/category/show',{ 
+            params : { 
+              whoCall: 'admin',
+            } 
+            }).then((res)=>{
             if(res.data.success === true){
                 setCategory(res.data.category);
             }
