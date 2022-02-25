@@ -29,7 +29,7 @@ class AuthController {
              await  registerAdmin.save()
                                 .then((message)=>{
                                     const {email,name,phone} = message;
-                                    const accessToken = jwt.sign({userId: registerAdmin._id}, process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '3600s'});
+                                    const accessToken = jwt.sign({userId: registerAdmin._id}, process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '36000s'});
                                     res.status(200).json({success:true,message:"Register Successfully ",accessToken,info:{name,email,phone}});
                                 })
                                 .catch((error)=>{

@@ -23,20 +23,20 @@ const productSchema = new Schema({
         required:[true , 'Please enter your slug!' ]
     },
     price:{
-        type:Number,
-        require:[true,'Please enter price for Product!']
+        type:String,
+        required:[true,'Please enter price for Product!']
     },
     qty:{
-        type:Number,
-        require:[true,'Please enter quantity for Product!']
+        type:String,
+        required:[true,'Please enter quantity for Product!']
     },
     category_id:{
         type: String,
-
+        default: 0,
     },
     image:{
         type:String,
-        require:[true,'Please add image for Product!']
+        required:[true,'Please add image for Product!']
     },
     type_display:{
         type:String,

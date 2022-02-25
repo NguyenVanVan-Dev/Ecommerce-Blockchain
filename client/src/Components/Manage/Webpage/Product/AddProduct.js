@@ -25,24 +25,38 @@ function AddProduct() {
         desc:'',
         slug:'',
         keyword:'',
-        price:0,
-        qty:0,
+        price:'',
+        qty:'',
         category_id:0,
         image:'',
         display:1,
         type_display:1,
-        error_list:[],
+        error_list:{},
     })
 
     const handleInput = (e)=>{
-        setProductInput({...productInput,[e.target.name]: e.target.value})
-    }
+        setProductInput({
+            ...productInput,
+            [e.target.name]: e.target.value,
+            error_list:{
+                ...productInput.error_list,
+                [e.target.name]: '',
+            }
+        })
+    };
     const handelImage = (e)=>{
         e.preventDefault();
         $('#image_product').trigger('click') 
     }
     const changeHandleFile = (e) => {
-        setProductInput({...productInput,[e.target.name]: e.target.files[0]})
+        setProductInput({
+            ...productInput,
+            [e.target.name]: e.target.files[0],
+            error_list:{
+                ...productInput.error_list,
+                [e.target.name]: '',
+            }
+        })
 	};
 
     const handelSubmit = (e)=>{
@@ -68,22 +82,28 @@ function AddProduct() {
                     desc:'',
                     slug:'',
                     keyword:'',
-                    price:0,
-                    qty:0,
+                    price:'',
+                    qty:'',
                     image:'',
+                    category_id:0,
                     display:1,
+                    type_display:1,
                     error_list:[],
                 });
                 Notiflix.Report.success(res.data.message,"Product has been added to the database" , 'Cancel');
             }
         }).catch((error)=>{
             console.log(error.response)
-            if(error.response.data.listError){
+            if(error.response.data.error){
+                Notiflix.Report.failure(error.response.data.message,error.response.data.error , 'Cancel');
+            }
+            if(error.response.data.listError){ 
                 setProductInput((prev)=>{
                     return {...prev,error_list: error.response.data.listError}
                 });
             }
         })
+        return false; // turnoff reload function for "multer" lib
     };
     return (
         <div className="container">
@@ -112,11 +132,11 @@ function AddProduct() {
                                     </div>
                                     <div className="form-group row">
                                         <div className="col-sm-4 mb-3 mb-sm-0">
-                                            <input type="number" onChange={handleInput} value={productInput.qty} name="qty" min='0' max='100000' className="form-control form-control-user" id="exampleFirstName" placeholder="Product Quantity" />
+                                            <input type="text" onChange={handleInput} value={productInput.qty} name="qty" min='0' max='100000' className="form-control form-control-user" id="exampleFirstName" placeholder="Product Quantity (Kg)" />
                                             {/* <span className="text-danger small">{productInput.error_list.name}</span> */}
                                         </div>
                                         <div className="col-sm-4">
-                                            <input type="number" onChange={handleInput} value={productInput.price} name="price" min='0'  className="form-control form-control-user"  placeholder="Product Price" />
+                                            <input type="text" onChange={handleInput} value={productInput.price} name="price" min='0'  className="form-control form-control-user"  placeholder="Product Price (VNĐ)" />
                                             {/* <span className="text-danger small">{productInput.error_list.slug}</span> */}
                                         </div>
                                         <div className="col-sm-4 mb-3 mb-sm-0">
@@ -137,6 +157,7 @@ function AddProduct() {
                                             <button onClick={handelImage}  className="btn btn-primary btn-block">
                                                 Chose Image Product
                                             </button>
+                                            <span className="text-danger small">{productInput.error_list.image}</span>
                                         </div>
                                         <div className="col-sm-3">
                                             <label htmlFor="SelectAnHien">Type Display Product</label>
@@ -174,7 +195,7 @@ function AddProduct() {
                                             </button>
                                         </div>
                                     </div>
-                                    <input type="file" id="image_product" onChange={changeHandleFile} accept="image/*" style={{display:'none'}} name="image" className="form-control form-control-user d-none "  placeholder="Product " />
+                                    <input type="file" id="image_product" onChange={changeHandleFile} accept="*" style={{display:'none'}} name="image" className="form-control form-control-user d-none "  placeholder="Product " />
                                 </form>     
                             </div>
                         </div>
