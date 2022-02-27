@@ -76,8 +76,14 @@ class AuthController {
             res.status(500).json({success:false,message:"Internal Server Error"})
         }
     }
-    async logout(req,res){
-        
+    async loginGooogle(req,res){
+        const {id} = req.body;
+        const accessToken = jwt.sign({userId: id},process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '6000s'});
+            res.json({
+                success:true,
+                message:"Login Successfully ",
+                accessToken
+        });
     }
 }
 

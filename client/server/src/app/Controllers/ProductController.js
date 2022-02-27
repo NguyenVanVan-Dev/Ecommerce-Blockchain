@@ -60,16 +60,15 @@ class ProductController {
      //[GET] /category/show
     async show(req,res){
         let whoCall = req.query.whoCall
-        let category 
+        let products 
         if(whoCall == 'admin'){
-            category = await productModle.find();
+            products = await productModle.find();
         }else {
-            category = await productModle.find({display:1});
+            products = await productModle.find({display:1});
         }
-        console.log(category);
         try {
-            if(category){
-                res.status(200).json({success:true,category});
+            if(products){
+                res.status(200).json({success:true,products});
             }
         } catch (error) {
             res.status(500).json({success:false,error});

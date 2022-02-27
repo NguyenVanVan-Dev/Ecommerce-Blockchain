@@ -1,5 +1,5 @@
 
-import { Routes, Route, Link ,Navigate} from "react-router-dom";
+import { Routes, Route} from "react-router-dom";
 
 import Login from "./Components/Manage/Auth/Login";
 import Register from "./Components/Manage/Auth/Register";
@@ -12,9 +12,10 @@ import AddCategory from "./Components/Manage/Webpage/Category/AddCategory";
 import ListCategory from "./Components/Manage/Webpage/Category/ListCategory";
 import DetailCategory from "./Components/Manage/Webpage/Category/DetailCategory";
 import AddProduct from "./Components/Manage/Webpage/Product/AddProduct";
+import ListProduct from "./Components/Manage/Webpage/Product/ListProduct";
 axios.defaults.baseURL = 'http://localhost:2105/';
 axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
-axios.defaults.headers.post ['Accept'] = 'application / json';
+axios.defaults.headers.post['Accept'] = 'application / json';
 axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 // axios.defaults.headers['authorization'] = 'Beaer ' + localStorage.getItem('auth_token')?? 'jhhhhhhhhhhhhhh';
 
@@ -40,6 +41,7 @@ function App() {
                 <Route path="list-category" element={<ListCategory/>} />
                 <Route path="category/:id" element={<DetailCategory/>} />
                 <Route path="add-product" element={<AddProduct/>} />
+                <Route path="list-product" element={<ListProduct/>} />
                 
             </Route>
         </Routes>

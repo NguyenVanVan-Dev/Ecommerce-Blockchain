@@ -6,6 +6,7 @@ const ModalLogout = ()=>{
     const handleLogout = (e)=>{
         localStorage.removeItem('auth_token');
         localStorage.removeItem('auth_name');
+        localStorage.removeItem('auth_avatar');
         navigate('/admin/login')
     }
   return (

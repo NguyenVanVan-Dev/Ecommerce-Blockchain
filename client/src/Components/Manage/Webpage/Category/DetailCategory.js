@@ -13,7 +13,6 @@ function DetailCategory() {
         display:1,
         error_list:[],
     })
-    console.log(categoryInput)
     useLayoutEffect(()=>{
         axios.get('/category/detail',{ 
             params : { 
@@ -54,7 +53,7 @@ function DetailCategory() {
         axios.put('/category/update',data).then(res =>{
             if(res.data.success === true)
             {
-                Notiflix.Report.success(res.data.message,"Catalog has been updated to the database" , 'Cancel');
+                Notiflix.Report.success(res.data.message,"Category has been updated to the database" , 'Cancel');
             }
         }).catch((error)=>{
             console.log(error.response)
@@ -91,7 +90,7 @@ function DetailCategory() {
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <textarea type="text"  id="editor" onChange={handleInput} value={categoryInput.desc} name="desc" rows={10}  className="form-control" id="exampleInputEmail"
+                                        <textarea type="text"  id="editor" onChange={handleInput} value={categoryInput.desc} name="desc" rows={10}  className="form-control" 
                                             placeholder="Category Description"/>
                                         <span className="text-danger small">{categoryInput.error_list.desc}</span>
                                     </div>

@@ -2,12 +2,12 @@ import React,{ useState,useEffect} from "react";
 import { Link, useNavigate} from "react-router-dom";
 import axios  from "axios";
 import Notiflix from 'notiflix';
+import { GoogleLogin} from 'react-google-login';
 const Login = () =>{
     let navigate = useNavigate();
     useEffect(() => {
         if ( localStorage.getItem('auth_token')) return navigate('/admin/dashboard');
-        return; 
-    }, []);
+    },[]);
     const [loginInput, setLoginInput] = useState({
         email:'',
         password:'',
@@ -23,7 +23,7 @@ const Login = () =>{
             password:loginInput.password,
         };
         axios.post('/admin/login',data).then(res =>{
-            if(res.data.success == true ){
+            if(res.data.success === true ){
                 localStorage.setItem('auth_name',res.data.info.name);
                 localStorage.setItem('auth_token',res.data.accessToken);
                 setLoginInput({...loginInput,error_list:[]});
@@ -33,7 +33,25 @@ const Login = () =>{
         }).catch((error)=>{
             Notiflix.Report.failure('Login Failure',error.response.data.message, 'Cancel');
         });
-    }
+    };
+    // Login with Google 
+    const clientId = "208882485320-g05b5oih0v1925793k36goam0havrn4h.apps.googleusercontent.com";
+    const onLoginSuccess = (res) => {  
+        let data = {
+            id:res.googleId
+        }; 
+        axios.post('/admin/login/google',data).then(result =>{
+            if(result.data.success === true ){
+                localStorage.setItem('auth_name',res.profileObj.name);
+                localStorage.setItem('auth_token',result.data.accessToken); 
+                localStorage.setItem('auth_avatar',res.profileObj.imageUrl);
+                Notiflix.Report.success('Login Successfully', `"Welcome to Ecommerce-BlockChain."<br/><br/>-${res.profileObj.name}`, 'Cancel');
+                navigate('/admin/dashboard');
+            }
+        }).catch((error)=>{
+            Notiflix.Report.failure('Login Failure',error.response.data.message, 'Cancel');
+        });
+    };
     return (   
         <div className="container">
             {/* Outer Row */}
@@ -69,9 +87,16 @@ const Login = () =>{
                                 Login
                             </button>
                             <hr />
-                            <a href="index.html" className="btn btn-google btn-user btn-block">
-                                <i className="fab fa-google fa-fw" /> Login with Google
-                            </a>
+                            <GoogleLogin
+                                clientId= {clientId}
+                                render={renderProps => (
+                                    <button onClick={renderProps.onClick} className="btn btn-google btn-user btn-block" >Login with Google</button>
+                                  )}
+                                buttonText="Login"
+                                onSuccess={onLoginSuccess}
+                                onFailure={onLoginSuccess}
+                                cookiePolicy={'single_host_origin'}
+                            />
                             <a href="index.html" className="btn btn-facebook btn-user btn-block">
                                 <i className="fab fa-facebook-f fa-fw" /> Login with Facebook
                             </a>

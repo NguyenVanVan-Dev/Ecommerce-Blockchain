@@ -15,7 +15,7 @@ const productSchema = new Schema({
         required:[true , 'Please enter your keyword!' ]
     },
     display:{
-        type:String,
+        type:Number,
         default: 0,
     },
     slug:{
@@ -23,11 +23,11 @@ const productSchema = new Schema({
         required:[true , 'Please enter your slug!' ]
     },
     price:{
-        type:String,
+        type:Number,
         required:[true,'Please enter price for Product!']
     },
     qty:{
-        type:String,
+        type:Number,
         required:[true,'Please enter quantity for Product!']
     },
     category_id:{
@@ -39,7 +39,7 @@ const productSchema = new Schema({
         required:[true,'Please add image for Product!']
     },
     type_display:{
-        type:String,
+        type:Number,
         default:1
     },
 },{
