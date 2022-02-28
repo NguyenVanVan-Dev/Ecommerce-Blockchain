@@ -62,8 +62,8 @@ class CategoryController {
     async detail(req,res){
         let id = req.query.id
         console.log(req.query.id)
-        const category = await categoryModle.findOne({_id:id});
         try {
+            const category = await categoryModle.findOne({_id:id});
             if(category){
                 res.status(200).json({success:true,category});
             }

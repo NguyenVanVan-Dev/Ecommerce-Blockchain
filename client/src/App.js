@@ -13,6 +13,7 @@ import ListCategory from "./Components/Manage/Webpage/Category/ListCategory";
 import DetailCategory from "./Components/Manage/Webpage/Category/DetailCategory";
 import AddProduct from "./Components/Manage/Webpage/Product/AddProduct";
 import ListProduct from "./Components/Manage/Webpage/Product/ListProduct";
+import DetailProduct from "./Components/Manage/Webpage/Product/DetailProduct";
 axios.defaults.baseURL = 'http://localhost:2105/';
 axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
 axios.defaults.headers.post['Accept'] = 'application / json';
@@ -42,6 +43,7 @@ function App() {
                 <Route path="category/:id" element={<DetailCategory/>} />
                 <Route path="add-product" element={<AddProduct/>} />
                 <Route path="list-product" element={<ListProduct/>} />
+                <Route path="product/:id" element={<DetailProduct/>} />
                 
             </Route>
         </Routes>

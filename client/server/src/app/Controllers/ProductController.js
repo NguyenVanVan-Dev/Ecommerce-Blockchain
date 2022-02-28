@@ -76,18 +76,15 @@ class ProductController {
     }
     async detail(req,res){
         let id = req.query.id
-        console.log(req.query.id)
-        const category = await productModle.findOne({_id:id});
+        
         try {
-            if(category){
-                res.status(200).json({success:true,category});
-            }
-            else
-            {
-                res.status(403).json({success:false,message:"Category not Found"});
+            const product = await productModle.findOne({_id:id});
+            console.log(product)
+            if(product){
+                res.status(200).json({success:true,product});
             }
         } catch (error) {
-            res.status(500).json({success:false,error});
+            res.status(400).json({success:false,message:"Category not Found"});
         }
     }
 

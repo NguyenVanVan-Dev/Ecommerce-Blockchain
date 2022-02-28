@@ -1,25 +1,10 @@
-import React ,{useState,useEffect} from "react";
-import {Link} from "react-router-dom";
+import React ,{useLayoutEffect, useState,useEffect} from "react";
+import {Link,useParams} from "react-router-dom";
 import axios  from "axios";
 import Notiflix from 'notiflix';
-import $ from 'jquery'
-
-function AddProduct() {
-    const [categories,setCategory] = useState([]);
-    useEffect(()=>{
-        axios.get('/category/show',{ 
-            params : { 
-              whoCall: 'admin',
-            } 
-            }).then((res)=>{
-            if(res.data.success === true){
-                setCategory(res.data.category);
-            }
-        })
-        .catch((error)=>{
-            Notiflix.Report.failure("Category not Found","please come back later" , 'Cancel');
-        })
-    },[])
+import $ from 'jquery';
+function DetailProduct() {
+    const { id } = useParams();
     const [productInput, setProductInput] = useState({
         name:'',
         desc:'',
@@ -32,26 +17,80 @@ function AddProduct() {
         display:1,
         type_display:1,
         error_list:{},
-    })
-    const [imageReview,setImageReview] = useState({
-        src: '',
     });
+    const [categories,setCategory] = useState([]);
+    const [imageReview,setImageReview] = useState({src: ''});
+    useEffect(()=>{
+        axios.get('/category/show',{ params : { whoCall: 'admin'} })
+            .then((res)=>{
+                if(res.data.success === true){
+                    setCategory(res.data.category);
+                }
+            })
+            .catch((error)=>{
+                Notiflix.Report.failure("Category not Found","please come back later" , 'Cancel');
+            })
+    },[]);
+    useLayoutEffect(()=>{
+        axios.get('/product/detail',{ params : { id } })
+            .then(res =>{
+                if(res.data.success === true){
+                    setProductInput({
+                        ...productInput,
+                        name:res.data.product.name,
+                        desc:res.data.product.desc,
+                        slug:res.data.product.slug,
+                        keyword:res.data.product.keyword,
+                        display:res.data.product.display,
+                        price:res.data.product.price,
+                        qty:res.data.product.qty,
+                        category_id:res.data.product.category_id,
+                        image:res.data.product.image,
+                        type_display:res.data.product.type_display,
+                        error_list:[],
+                    }); 
+                    setImageReview({ src: '/uploads/'+res.data.product.image });
+                }
+            }).catch((error)=>{
+                Notiflix.Report.failure(error.response.data.message,`No product found with id "${id}" ` , 'Cancel');
+            })
+    },[]);
     const handleInput = (e)=>{
-        setProductInput({
-            ...productInput,
-            [e.target.name]: e.target.value,
-            error_list:{
-                ...productInput.error_list,
-                [e.target.name]: '',
-            }
-        })
+        setProductInput({...productInput,[e.target.name]: e.target.value})
+    }
+
+    const handelSubmit = (e)=>{
+        e.preventDefault();
+        let data ={
+            id:productInput.id,
+            name:productInput.name,
+            desc:productInput.desc,
+            slug:productInput.slug,
+            keyword:productInput.keyword,
+            display:productInput.display, 
+        };
+        axios.put('/product/update',data)
+            .then(res =>{
+                if(res.data.success === true)
+                {
+                    Notiflix.Report.success(res.data.message,"Product has been updated to the database" , 'Cancel');
+                }
+            }).catch((error)=>{
+                console.log(error.response)
+                if(error.response.data.listError){
+                    setProductInput((prev)=>{
+                        return {...prev,error_list: error.response.data.listError}
+                    });
+                }
+            })
     };
+
     const handelImage = (e)=>{
         e.preventDefault();
         $('#image_product').trigger('click') 
     }
+
     const changeHandleFile = (e) => {
-        
         const reader = new FileReader();
         reader.onload = function(){
             const result = reader.result;
@@ -61,6 +100,7 @@ function AddProduct() {
         $('.name_image').text(e.target.files[0].name);
         setContentFile(e);
 	};
+
     const setContentFile = (e)=>{
         setProductInput({
             ...productInput,
@@ -71,52 +111,7 @@ function AddProduct() {
             }
         })
     }
-    const handelSubmit = (e)=>{
-        e.preventDefault();
-        const formData = new FormData();
 
-		formData.append('name', productInput.name);
-		formData.append('desc', productInput.desc);
-		formData.append('slug', productInput.slug);
-		formData.append('keyword', productInput.keyword);
-		formData.append('display', productInput.display);
-		formData.append('type', productInput.type_display);
-		formData.append('category_id', productInput.category_id);
-		formData.append('image', productInput.image);
-		formData.append('price', productInput.price);
-		formData.append('qty', productInput.qty);
-
-        axios.post('/product/store',formData).then(res =>{
-            if(res.data.success === true)
-            {
-                setProductInput({
-                    name:'',
-                    desc:'',
-                    slug:'',
-                    keyword:'',
-                    price:'',
-                    qty:'',
-                    image:'',
-                    category_id:0,
-                    display:1,
-                    type_display:1,
-                    error_list:[],
-                });
-                Notiflix.Report.success(res.data.message,"Product has been added to the database" , 'Cancel');
-            }
-        }).catch((error)=>{
-            console.log(error.response)
-            if(error.response.data.error){
-                Notiflix.Report.failure(error.response.data.message,error.response.data.error , 'Cancel');
-            }
-            if(error.response.data.listError){ 
-                setProductInput((prev)=>{
-                    return {...prev,error_list: error.response.data.listError}
-                });
-            }
-        })
-        return false; // turnoff reload function for "multer" lib
-    };
     return (
         <div className="container">
             <div className="card o-hidden border-0 shadow-lg my-5">
@@ -126,7 +121,7 @@ function AddProduct() {
                         <div className="col-lg-12">
                             <div className="p-5">
                             <div className="text-center">
-                                <h1 className="h4 text-gray-900 mb-4">Add  Product</h1>
+                                <h1 className="h4 text-gray-900 mb-4">Edit  Product</h1>
                             </div>
                             <div className="">
                                 <Link to={'/admin/list-product'} className="btn btn-primary mb-4">List Product</Link>
@@ -202,8 +197,9 @@ function AddProduct() {
                                     </div>
                                     <div className="form-group text-center" >
                                         <img src={imageReview.src} id='review-image' className=" img-thumbnail w-50" alt="..."/>
-                                        <p>  Image : <i className="name_image"></i></p>
+                                        <p>  Image : <i>{productInput.image}</i></p>
                                     </div>
+                                
                                     <div className="form-row mt-5">
                                         <div className="form-group col-md-3">
                                             <button onClick={handelSubmit} className="btn btn-primary btn-user btn-block">
@@ -211,7 +207,7 @@ function AddProduct() {
                                             </button>
                                         </div>
                                     </div>
-                                    <input type="file" id="image_product" onChange={changeHandleFile} accept="*" style={{display:'none'}} name="image" className="form-control form-control-user d-none "  placeholder="Product " />
+                                    <input type="file" id="image_product" onChange={changeHandleFile} accept="image/*" style={{display:'none'}} name="image" className=" d-none " />
                                 </form>     
                             </div>
                         </div>
@@ -220,6 +216,8 @@ function AddProduct() {
             </div>
         </div>
     )
+
+
 }
 
-export default AddProduct
+export default DetailProduct
