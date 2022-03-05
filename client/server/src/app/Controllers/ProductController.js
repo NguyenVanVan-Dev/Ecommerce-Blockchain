@@ -16,7 +16,6 @@ class ProductController {
             }
             else
             {
-                console.log( req.file);
                 const {name, keyword, desc,display,slug,category_id,price,qty,type} = req.body;
                 const productSave  = new productModle({ 
                         name,
@@ -79,7 +78,7 @@ class ProductController {
         
         try {
             const product = await productModle.findOne({_id:id});
-            console.log(product)
+            // console.log(product)
             if(product){
                 res.status(200).json({success:true,product});
             }
@@ -89,29 +88,45 @@ class ProductController {
     }
 
     async update(req,res){
-        const {name, keyword, desc,display,slug,id} = req.body;
         let listError = {};
-        
-        try {
-            const opts = { runValidators: true };
-            await  productModle.updateOne({ _id: id },{ $set:{name, keyword, desc,display,slug}},opts)
-                    .then((result)=>{
-                        console.log(result)
-                        res.status(200).json({success:true,message:"Update Category Successfully "});
-                    })
-                    .catch((error)=>{
-                        console.log(error.errors)
-                        listError = {
-                            name:error.errors.name ? error.errors.name.message : '',
-                            keyword:error.errors.keyword ? error.errors.keyword.message : '',
-                            desc:error.errors.desc ? error.errors.desc.message  : '',
-                            slug:error.errors.slug ? error.errors.slug.message  : ''
-                        };
-                        res.status(403).json({success:false,message:"Update Category Failure!",listError});
-                    });
-        } catch (error) {
-            res.status(500).json({success:false,message:"Internal Server Error"})
-        }
+        Uploadfile(req,res,(error)=>{
+            if(error){
+                res.status(400).json({message:'Upload File Failure!',error: error.message})
+            }
+            else
+            {
+                const {name, keyword, desc,display,slug,category_id,price,qty,type,old_image,id} = req.body;
+                const unlinkAsync = promisify(fs.unlink);
+                console.log(old_image);
+                console.log(req.file);
+                const opts = { runValidators: true };
+                productModle.updateOne({_id:id},{ $set:{ name,keyword,desc,display,slug,category_id,price,qty,type_display:type,image: req.file ? req.file.filename : ''}},opts)
+                        .then((result)=>{
+                            unlinkAsync(`public\\uploads\\${old_image}`);
+                            res.status(200).json({success:true,message:"Update Product Successfully "});
+                        })
+                        .catch((error)=>{
+                            
+                            if(req.file)
+                            {
+                                unlinkAsync(req.file.path);
+                            } else 
+                            {
+                                listError={
+                                    image: 'Please Chose Image for product!'
+                                } 
+                            }
+                            listError = {
+                                ...listError,
+                                name:error.errors.name ? error.errors.name.message : '',
+                                keyword:error.errors.keyword ? error.errors.keyword.message : '',
+                                desc:error.errors.desc ? error.errors.desc.message  : '',
+                                slug:error.errors.slug ? error.errors.slug.message  : ''
+                            };
+                            res.status(403).json({success:false,message:"Add Product Failure!",listError});
+                        });
+            }
+        })
     }
     async delete(req,res){
       const  {id} = req.body;

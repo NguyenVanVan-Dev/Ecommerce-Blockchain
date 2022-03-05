@@ -19,7 +19,7 @@ function DetailProduct() {
         error_list:{},
     });
     const [categories,setCategory] = useState([]);
-    const [imageReview,setImageReview] = useState({src: ''});
+    const [imageReview,setImageReview] = useState({src: '',file:''});
     useEffect(()=>{
         axios.get('/category/show',{ params : { whoCall: 'admin'} })
             .then((res)=>{
@@ -31,7 +31,7 @@ function DetailProduct() {
                 Notiflix.Report.failure("Category not Found","please come back later" , 'Cancel');
             })
     },[]);
-    useLayoutEffect(()=>{
+    useEffect(()=>{
         axios.get('/product/detail',{ params : { id } })
             .then(res =>{
                 if(res.data.success === true){
@@ -58,60 +58,54 @@ function DetailProduct() {
     const handleInput = (e)=>{
         setProductInput({...productInput,[e.target.name]: e.target.value})
     }
-
-    const handelSubmit = (e)=>{
-        e.preventDefault();
-        let data ={
-            id:productInput.id,
-            name:productInput.name,
-            desc:productInput.desc,
-            slug:productInput.slug,
-            keyword:productInput.keyword,
-            display:productInput.display, 
-        };
-        axios.put('/product/update',data)
-            .then(res =>{
-                if(res.data.success === true)
-                {
-                    Notiflix.Report.success(res.data.message,"Product has been updated to the database" , 'Cancel');
-                }
-            }).catch((error)=>{
-                console.log(error.response)
-                if(error.response.data.listError){
-                    setProductInput((prev)=>{
-                        return {...prev,error_list: error.response.data.listError}
-                    });
-                }
-            })
-    };
-
     const handelImage = (e)=>{
         e.preventDefault();
         $('#image_product').trigger('click') 
     }
-
     const changeHandleFile = (e) => {
         const reader = new FileReader();
         reader.onload = function(){
             const result = reader.result;
-            setImageReview({src: result});
+            setImageReview({src: result , file:e.target.files[0] });
         }
         reader.readAsDataURL(e.target.files[0]);
         $('.name_image').text(e.target.files[0].name);
-        setContentFile(e);
 	};
+    const handelSubmit = (e)=>{
+        e.preventDefault();
+        const formData = new FormData();
 
-    const setContentFile = (e)=>{
-        setProductInput({
-            ...productInput,
-            [e.target.name]: e.target.files[0],
-            error_list:{
-                ...productInput.error_list,
-                [e.target.name]: '',
+		formData.append('name', productInput.name);
+		formData.append('desc', productInput.desc);
+		formData.append('slug', productInput.slug);
+		formData.append('keyword', productInput.keyword);
+		formData.append('display', productInput.display);
+		formData.append('type', productInput.type_display);
+		formData.append('category_id', productInput.category_id);
+		formData.append('image', imageReview.file);
+		formData.append('price', productInput.price);
+		formData.append('qty', productInput.qty);
+		formData.append('old_image', productInput.image);
+		formData.append('id', id);
+
+        axios.put('/product/update',formData).then(res =>{
+            if(res.data.success === true)
+            {
+                Notiflix.Report.success(res.data.message,"Product has been updated to the database" , 'Cancel');
+            }
+        }).catch((error)=>{
+            console.log(error.response)
+            if(error.response.data.error){
+                Notiflix.Report.failure(error.response.data.message,error.response.data.error , 'Cancel');
+            }
+            if(error.response.data.listError){ 
+                setProductInput((prev)=>{
+                    return {...prev,error_list: error.response.data.listError}
+                });
             }
         })
-    }
-
+        return false;
+    };
     return (
         <div className="container">
             <div className="card o-hidden border-0 shadow-lg my-5">
@@ -197,13 +191,13 @@ function DetailProduct() {
                                     </div>
                                     <div className="form-group text-center" >
                                         <img src={imageReview.src} id='review-image' className=" img-thumbnail w-50" alt="..."/>
-                                        <p>  Image : <i>{productInput.image}</i></p>
+                                        <p>  Image : <i className="name_image"> {productInput.image}</i></p>
                                     </div>
                                 
                                     <div className="form-row mt-5">
                                         <div className="form-group col-md-3">
                                             <button onClick={handelSubmit} className="btn btn-primary btn-user btn-block">
-                                                Add Product
+                                                Update Product
                                             </button>
                                         </div>
                                     </div>

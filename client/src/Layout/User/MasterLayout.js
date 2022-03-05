@@ -1,6 +1,4 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
-import logo from '../../Resource/UserInterface/img/logo.png';
 import TopBar from "../../Components/User/Topbar"
 import Header from "../../Components/User/Header";
 import SideBarCategory from "../../Components/User/SideBarCategory";
@@ -32,6 +30,5 @@ const MasterLayout = () =>{
        </>
     )
 }
-
 
 export default MasterLayout;

@@ -211,7 +211,7 @@ function AddProduct() {
                                             </button>
                                         </div>
                                     </div>
-                                    <input type="file" id="image_product" onChange={changeHandleFile} accept="*" style={{display:'none'}} name="image" className="form-control form-control-user d-none "  placeholder="Product " />
+                                    <input type="file" id="image_product" onChange={changeHandleFile} accept="image/*" style={{display:'none'}} name="image" className="form-control form-control-user d-none "  placeholder="Product " />
                                 </form>     
                             </div>
                         </div>
