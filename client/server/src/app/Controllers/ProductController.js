@@ -58,16 +58,27 @@ class ProductController {
     }
      //[GET] /category/show
     async show(req,res){
-        let whoCall = req.query.whoCall
-        let products 
-        if(whoCall == 'admin'){
-            products = await productModle.find();
-        }else {
-            products = await productModle.find({display:1});
-        }
-
-        console.log(products);
+        let whoCall = req.query.whoCall;
+        let type =req.query.type;
+        let products ;
         try {
+            if(whoCall == 'admin'){
+                products = await productModle.find();
+            }else 
+            {
+                switch (type) {
+                    case 'featured':
+                        products = await productModle.find({type_display: 1 , display: 1});
+                        break;
+                    case 'latest':
+                        products = await productModle.find({type_display: 2 , display: 1});
+                        break;
+                    default:
+                        products = await productModle.find({display: 1});
+                        break;
+                }
+            }
+            console.log(products);
             if(products){
                 res.status(200).json({success:true,products});
             }

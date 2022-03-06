@@ -44,14 +44,22 @@ class CategoryController {
     }
      //[GET] /category/show
     async show(req,res){
-        let whoCall = req.query.whoCall
-        let category 
-        if(whoCall == 'admin'){
-            category = await categoryModle.find();
-        }else {
-            category = await categoryModle.find({display:1});
-        }
+        let whoCall = req.query.whoCall;
+        let type = req.query.type;
+        let category ;
         try {
+            if(whoCall == 'admin'){
+                category = await categoryModle.find();
+            }else {
+                switch (type) {
+                    case 'featured':
+                        category = await categoryModle.find({display:1}).limit(4);
+                        break;
+                    default:
+                        category = await categoryModle.find({display:1});
+                        break;
+                }
+            }
             if(category){
                 res.status(200).json({success:true,category});
             }
