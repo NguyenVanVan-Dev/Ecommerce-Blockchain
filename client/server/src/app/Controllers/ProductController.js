@@ -65,6 +65,8 @@ class ProductController {
         }else {
             products = await productModle.find({display:1});
         }
+
+        console.log(products);
         try {
             if(products){
                 res.status(200).json({success:true,products});
@@ -97,8 +99,6 @@ class ProductController {
             {
                 const {name, keyword, desc,display,slug,category_id,price,qty,type,old_image,id} = req.body;
                 const unlinkAsync = promisify(fs.unlink);
-                console.log(old_image);
-                console.log(req.file);
                 const opts = { runValidators: true };
                 productModle.updateOne({_id:id},{ $set:{ name,keyword,desc,display,slug,category_id,price,qty,type_display:type,image: req.file ? req.file.filename : ''}},opts)
                         .then((result)=>{
@@ -129,17 +129,21 @@ class ProductController {
         })
     }
     async delete(req,res){
-      const  {id} = req.body;
+      const  {id} = req.body; 
       if(!id){
-        res.status(403).json({success:false,message:"Delete Category Failure , Infomation not found"});
+        res.status(403).json({success:false,message:"Delete Product Failure , Infomation not found"});
       }
       try {
+        await productModle.findById( id )
+                        .then((resoult)=>{
+                            const unlinkAsync = promisify(fs.unlink);
+                            unlinkAsync(`public\\uploads\\${resoult.image}`);
+                        })
         await  productModle.deleteOne({ _id: id })
-                            .then((result)=>{
-                                res.status(200).json({success:true,message:"Delete Category Successfully "});
-                            })
+                .then((result)=>{
+                    res.status(200).json({success:true});
+                })
       } catch (error) {
-        console.log(error)
         res.status(500).json({success:false,message:"Internal Server Error"})
       }
     }

@@ -62,13 +62,15 @@ function DetailProduct() {
         e.preventDefault();
         $('#image_product').trigger('click') 
     }
+    useEffect(() => {
+        return () => {
+            imageReview.src && URL.revokeObjectURL(imageReview.src);
+        };
+    }, [imageReview]);
     const changeHandleFile = (e) => {
-        const reader = new FileReader();
-        reader.onload = function(){
-            const result = reader.result;
-            setImageReview({src: result , file:e.target.files[0] });
-        }
-        reader.readAsDataURL(e.target.files[0]);
+        const file = e.target.files[0];
+        file.preview = URL.createObjectURL(file)
+        setImageReview({src: file.preview,file:e.target.files[0] }); 
         $('.name_image').text(e.target.files[0].name);
 	};
     const handelSubmit = (e)=>{
@@ -119,6 +121,7 @@ function DetailProduct() {
                             </div>
                             <div className="">
                                 <Link to={'/admin/list-product'} className="btn btn-primary mb-4">List Product</Link>
+                                <Link to={'/admin/add-product'} className="btn btn-success mb-4 ml-4">Add Product</Link>
                             </div>
                                 <form className="user">
                                     <div className="form-group row">
@@ -190,7 +193,7 @@ function DetailProduct() {
                                         </div>
                                     </div>
                                     <div className="form-group text-center" >
-                                        <img src={imageReview.src} id='review-image' className=" img-thumbnail w-50" alt="..."/>
+                                        { imageReview && (<img src={imageReview.src} id='review-image' className=" img-thumbnail w-50" alt="..."/>)}
                                         <p>  Image : <i className="name_image"> {productInput.image}</i></p>
                                     </div>
                                 

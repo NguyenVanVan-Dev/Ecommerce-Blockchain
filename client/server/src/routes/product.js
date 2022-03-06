@@ -7,7 +7,7 @@ router.post('/store',authMiddleware,productController.store);
 router.get('/show',productController.show);
 router.get('/detail',authMiddleware,productController.detail);
 router.put('/update',authMiddleware,productController.update);
-router.post('/delete',authMiddleware,productController.delete);
+router.delete('/delete',authMiddleware,productController.delete);
 
 
 

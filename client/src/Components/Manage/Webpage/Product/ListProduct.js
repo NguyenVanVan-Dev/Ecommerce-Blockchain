@@ -33,7 +33,7 @@ function ListProduct() {
         })
         .catch((error)=>{
             reject(error)
-            Notiflix.Report.failure("Category not Found","please come back later" , 'Cancel');
+            Notiflix.Report.failure("Category not Found","Please come back later" , 'Cancel');
         })
     });
 
@@ -45,12 +45,14 @@ function ListProduct() {
     },[])
 
     const handleRemoveProduct = (id)=>{
-        const data = {id};
-        axios.post('/category/delete',data).then((res)=>{
+        axios.delete('/product/delete',{data: {id}}).then((res)=>{
             if(res.data.success === true){
-                Notiflix.Report.failure("Delete Category Successfully","Category has been remove from database" , 'Cancel');
+                Notiflix.Report.warning("Delete Product Successfully","Product has been remove from database" , 'Cancel');
                 $('#'+id).remove()
-            }
+            } 
+        }).catch((error)=>{
+                
+                Notiflix.Report.failure("Delete Product Failure",error.data.message, 'Cancel');
         })
     }
     return (
@@ -89,11 +91,6 @@ function ListProduct() {
 
                                         let display = '';
                                         let type_display = '';
-                                        let category = Object.values(categories).filter((category)=>{
-                                            return category._id === product.category_id;
-                                        })
-                                        
-                                        console.log(category);
                                         product.display === 1 ?display = 'show' : display = 'hidden';
                                         switch (product.type_display) {
                                             case 1:
@@ -126,7 +123,7 @@ function ListProduct() {
                                                     <td>{product.price}</td>
                                                     <td>{product.qty}</td>
                                                     
-                                                    <td>{category[0].name}</td>
+                                                    <td>{product.category_id}</td>
                                                     <td>{ type_display}</td>
                                                     <td>
                                                         <Link to={'/admin/product/'+product._id} className="btn btn-info mr-1 mb-1"><i className="fas fa-edit"></i></Link>

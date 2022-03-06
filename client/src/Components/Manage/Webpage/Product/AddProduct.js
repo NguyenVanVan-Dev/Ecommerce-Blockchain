@@ -187,7 +187,7 @@ function AddProduct() {
                                                 <option value={0} className="optionform">---Chose Category---</option>
                                                 {categories ? categories.map((category)=>{
                                                     return (
-                                                        <option key={category._id} value={category._id} className="optionform">{category.name}</option>
+                                                        <option key={category._id} value={category.slug} className="optionform">{category.name}</option>
                                                     )
                                                 }) : ''}
                                             </select>
