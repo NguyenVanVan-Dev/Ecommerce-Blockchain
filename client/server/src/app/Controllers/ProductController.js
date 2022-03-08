@@ -63,7 +63,7 @@ class ProductController {
         let products ;
         try {
             if(whoCall == 'admin'){
-                products = await productModle.find();
+                products = await productModle.find().sort({ createdAt: -1 });
             }else 
             {
                 switch (type) {
