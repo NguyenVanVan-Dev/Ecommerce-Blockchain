@@ -60,7 +60,9 @@ class ProductController {
     async show(req,res){
         let whoCall = req.query.whoCall;
         let type =req.query.type;
-        let products ;
+        let products = {} ;
+        let listOne;
+        let listTwo;
         try {
             if(whoCall == 'admin'){
                 products = await productModle.find().sort({ createdAt: -1 });
@@ -68,21 +70,34 @@ class ProductController {
             {
                 switch (type) {
                     case 'featured':
-                        products = await productModle.find({type_display: 1 , display: 1});
+                        products = await productModle.find({type_display: 1 , display: 1}).sort({ createdAt: -1 }).limit(12);
                         break;
                     case 'latest':
-                        products = await productModle.find({type_display: 2 , display: 1});
+                         listOne = await productModle.find({type_display: 2 , display: 1}).sort({ createdAt: -1 }).limit(3);
+                         listTwo = await productModle.find({type_display: 2 , display: 1}).sort({ createdAt: -1 }).skip(3).limit(3);
+                        products = {
+                            listOne,
+                            listTwo
+                        }
                         break;
+                    case 'top-rated':
+                         listOne = await productModle.find({type_display: 3 , display: 1}).sort({ createdAt: -1 }).limit(3);
+                         listTwo = await productModle.find({type_display: 3 , display: 1}).sort({ createdAt: -1 }).skip(3).limit(3);
+                        products = {
+                            listOne,
+                            listTwo
+                        }
+                        break;    
                     default:
                         products = await productModle.find({display: 1});
                         break;
                 }
             }
-            console.log(products);
             if(products){
                 res.status(200).json({success:true,products});
             }
         } catch (error) {
+            console.log(error)
             res.status(500).json({success:false,error});
         }
     }
