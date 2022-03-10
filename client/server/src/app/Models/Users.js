@@ -21,6 +21,10 @@ const userSchema = new Schema({
         type:String,
         min:[8, 'Please enter a password longer than 8 characters!'],
         required:[true , 'Please enter your password!' ]
+    },
+    resetLink:{
+        type:String,
+        default:''
     }
     
 },{

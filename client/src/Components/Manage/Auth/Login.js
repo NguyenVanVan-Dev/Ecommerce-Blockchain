@@ -103,10 +103,10 @@ const Login = () =>{
                             </form>
                             <hr />
                             <div className="text-center">
-                            <a className="small" href="forgot-password.html">Forgot Password?</a>
+                            <Link className="small" to="/admin/forgot-password">Forgot Password?</Link>
                             </div>
                             <div className="text-center">
-                            <Link className="small"  to="/admin/register">Create an Account!</Link>
+                                <Link className="small"  to="/admin/register">Create an Account!</Link>
                             </div>
                         </div>
                         </div>
