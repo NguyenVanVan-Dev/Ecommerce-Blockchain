@@ -145,11 +145,11 @@ function AddProduct() {
                                     <div className="form-group row">
                                         <div className="col-sm-4 mb-3 mb-sm-0">
                                             <input type="text" onChange={handleInput} value={productInput.qty} name="qty" min='0' max='100000' className="form-control form-control-user" id="exampleFirstName" placeholder="Product Quantity (Kg)" />
-                                            {/* <span className="text-danger small">{productInput.error_list.name}</span> */}
+                                            <span className="text-danger small">{productInput.error_list.qty}</span>
                                         </div>
                                         <div className="col-sm-4">
                                             <input type="text" onChange={handleInput} value={productInput.price} name="price" min='0'  className="form-control form-control-user"  placeholder="Product Price (VNĐ)" />
-                                            {/* <span className="text-danger small">{productInput.error_list.slug}</span> */}
+                                            <span className="text-danger small">{productInput.error_list.price}</span>
                                         </div>
                                         <div className="col-sm-4 mb-3 mb-sm-0">
                                             <input type="text" onChange={handleInput} value={productInput.keyword} name="keyword" className="form-control form-control-user " id="exampleInputPassword" placeholder="Key Word" />

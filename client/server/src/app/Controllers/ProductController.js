@@ -8,55 +8,45 @@ class ProductController {
     
     //[POST] /product/store
     async store(req, res){
-
         let listError = {};
-        Uploadfile(req,res,(error)=>{
-            if(error){
-                res.status(400).json({message:'Upload File Failure!',error: error.message})
-            }
-            else
-            {
-                const {name, keyword, desc,display,slug,category_id,price,qty,type} = req.body;
-                const productSave  = new productModle({ 
-                        name,
-                        keyword,
-                        desc,
-                        display,
-                        slug,
-                        category_id,
-                        price,
-                        qty,
-                        type_display:type,
-                        image: req.file ? req.file.filename : ''
+        const {name, keyword, desc,display,slug,category_id,price,qty,type} = req.body;
+        const productSave  = new productModle({ 
+                name,
+                keyword,
+                desc,
+                display,
+                slug,
+                category_id,
+                price,
+                qty,
+                type_display:type,
+                image: req.file ? req.file.filename : ''
+        });
+        await productSave.save()
+                .then((result)=>{
+                    console.log(result); 
+                    res.status(200).json({success:true,message:"Add Product Successfully "});
+                })
+                .catch((error)=>{
+                    const unlinkAsync = promisify(fs.unlink);
+                    if(req.file)
+                    {
+                        unlinkAsync(req.file.path);
+                    }  
+                    listError = {
+                        ...listError,
+                        name:error.errors.name ? error.errors.name.message : '',
+                        keyword:error.errors.keyword ? error.errors.keyword.message : '',
+                        desc:error.errors.desc ? error.errors.desc.message  : '',
+                        slug:error.errors.slug ? error.errors.slug.message  : '',
+                        price:error.errors.price ? error.errors.price.message  : '',
+                        qty:error.errors.qty ? error.errors.qty.message  : '',
+                        image:error.errors.image ? error.errors.image.message  : '',
+                    };
+                    res.status(400).json({success:false,message:"Add Product Failure!",listError});
                 });
-                        productSave.save()
-                        .then((result)=>{
-                            res.status(200).json({success:true,message:"Add Product Successfully "});
-                        })
-                        .catch((error)=>{
-                            const unlinkAsync = promisify(fs.unlink);
-                            if(req.file)
-                            {
-                                unlinkAsync(req.file.path);
-                            } else 
-                            {
-                                listError={
-                                    image: 'Please Chose Image for product!'
-                                }
-                            }
-                            listError = {
-                                ...listError,
-                                name:error.errors.name ? error.errors.name.message : '',
-                                keyword:error.errors.keyword ? error.errors.keyword.message : '',
-                                desc:error.errors.desc ? error.errors.desc.message  : '',
-                                slug:error.errors.slug ? error.errors.slug.message  : ''
-                            };
-                            res.status(403).json({success:false,message:"Add Product Failure!",listError});
-                        });
-            }
-        })
     }
-     //[GET] /category/show
+     //[GET] /product/show
     async show(req,res){
         let whoCall = req.query.whoCall;
         let type =req.query.type;
@@ -101,12 +91,12 @@ class ProductController {
             res.status(500).json({success:false,error});
         }
     }
+    //[GET] /product/detail?id=...
     async detail(req,res){
-        let id = req.query.id
+        let { id } = req.query
         
         try {
             const product = await productModle.findOne({_id:id});
-            // console.log(product)
             if(product){
                 res.status(200).json({success:true,product});
             }
@@ -114,50 +104,44 @@ class ProductController {
             res.status(400).json({success:false,message:"Category not Found"});
         }
     }
-
+    //[PUT] /product/update
     async update(req,res){
         let listError = {};
-        Uploadfile(req,res,(error)=>{
-            if(error){
-                res.status(400).json({message:'Upload File Failure!',error: error.message})
-            }
-            else
-            {
-                const {name, keyword, desc,display,slug,category_id,price,qty,type,old_image,id} = req.body;
-                const unlinkAsync = promisify(fs.unlink);
-                const opts = { runValidators: true };
-                productModle.updateOne({_id:id},{ $set:{ name,keyword,desc,display,slug,category_id,price,qty,type_display:type,image: req.file ? req.file.filename : ''}},opts)
-                        .then((result)=>{
-                            unlinkAsync(`public\\uploads\\${old_image}`);
-                            res.status(200).json({success:true,message:"Update Product Successfully "});
-                        })
-                        .catch((error)=>{
-                            
-                            if(req.file)
-                            {
-                                unlinkAsync(req.file.path);
-                            } else 
-                            {
-                                listError={
-                                    image: 'Please Chose Image for product!'
+        const {name, keyword, desc,display,slug,category_id,price,qty,type,old_image,id} = req.body;
+        const unlinkAsync = promisify(fs.unlink);
+        const opts = { runValidators: true };
+        let update = { $set:{ name,keyword,desc,display,slug,category_id,price,qty,type_display:type,image: req.file ? req.file.filename : old_image}};
+        await productModle.updateOne({_id:id},update,opts)
+                            .then((result)=>{
+                                if(req.file) 
+                                {
+                                    unlinkAsync(`public\\uploads\\${old_image}`);
                                 } 
-                            }
-                            listError = {
-                                ...listError,
-                                name:error.errors.name ? error.errors.name.message : '',
-                                keyword:error.errors.keyword ? error.errors.keyword.message : '',
-                                desc:error.errors.desc ? error.errors.desc.message  : '',
-                                slug:error.errors.slug ? error.errors.slug.message  : ''
-                            };
-                            res.status(403).json({success:false,message:"Add Product Failure!",listError});
-                        });
-            }
-        })
+                                res.status(200).json({success:true,message:"Update Product Successfully "});
+                            })
+                            .catch((error)=>{
+                                if(req.file) 
+                                {
+                                    unlinkAsync(req.file.path);
+                                } 
+                                listError = {
+                                    ...listError,
+                                    name:error.errors.name ? error.errors.name.message : '',
+                                    keyword:error.errors.keyword ? error.errors.keyword.message : '',
+                                    desc:error.errors.desc ? error.errors.desc.message  : '',
+                                    slug:error.errors.slug ? error.errors.slug.message  : '',
+                                    price:error.errors.price ? error.errors.price.message  : '',
+                                    qty:error.errors.qty ? error.errors.qty.message  : '',
+                                    image:error.errors.image ? error.errors.image.message  : '',
+                                };
+                                res.status(400).json({success:false,message:"Add Product Failure!",listError});
+                            });
     }
+    //[DELETE] /product/delete
     async delete(req,res){
       const  {id} = req.body; 
       if(!id){
-        res.status(403).json({success:false,message:"Delete Product Failure , Infomation not found"});
+        res.status(400).json({success:false,message:"Delete Product Failure , Infomation not found"});
       }
       try {
         await productModle.findById( id )
