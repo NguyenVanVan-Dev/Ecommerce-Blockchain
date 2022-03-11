@@ -60,7 +60,7 @@ class AuthController {
                 return res.status(400).json({success:false, message:"Incorret Email or Password!"})
             }
     
-            const accessToken = jwt.sign({userId: user._id},process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '6000s'});
+            const accessToken = jwt.sign({userId: user._id},process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '3h'});
     
             res.json({
                 success:true,
@@ -78,12 +78,55 @@ class AuthController {
     }
     async loginGooogle(req,res){
         const {id} = req.body;
-        const accessToken = jwt.sign({userId: id},process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '6000s'});
+        const accessToken = jwt.sign({userId: id},process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '3h'});
             res.json({
                 success:true,
                 message:"Login Successfully ",
                 accessToken
         });
+    }
+    async forgotPassword(req,res){
+        const {email } = req.body;
+        User.findOne({email},(err,user)=>{
+            if(err || !user)
+            {
+               return  res.status(400).json({message: " User with this email does not exits."})
+            }
+            const resetAccountToken = jwt.sign({userId: user._id},process.env.RESET_PASSWORD_SECRET,{ expiresIn: '20m'});
+
+            return user.updateOne({resetLink:resetAccountToken}, (err,success)=>{
+                if(err)
+                {
+                    return  res.status(400).json({message: " Reset link error"})
+                }
+                res.status(200).json({success:true,link: `http://localhost:2106/admin/reset-password/${resetAccountToken}`});
+            })
+        })
+    }
+    async resetPassword(req,res){
+        const  {token, password} = req.body;
+        const hashPassword = await argon2.hash(password)
+        jwt.verify(token,process.env.RESET_PASSWORD_SECRET,(err,decodeData)=>{
+            if(err)
+            {
+                return res.status(403).json({success:false,message:"Incorret token or token it is expried"})
+            }
+            User.findOne({token},(err,user)=>{
+                if(err || !user)
+                {
+                   return  res.status(400).json({message: " User with this token does not exits."})
+                }
+                const {email,name,phone,_id} = user;
+                user.updateOne({password:hashPassword},(err,success)=>{
+                    if(err)
+                    {
+                        return  res.status(400).json({message: " Reset link error",error:err})
+                    }
+                    const accessToken = jwt.sign({userId: _id}, process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '3h'});
+                    res.status(200).json({success:true,message:'Your password has been changed',accessToken,info:{name,email,phone}});
+                })
+            })
+        })
     }
 }
 
