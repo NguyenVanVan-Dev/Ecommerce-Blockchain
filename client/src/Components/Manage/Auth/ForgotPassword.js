@@ -21,7 +21,6 @@ const ForgotPassword = () =>{
         };
         axios.put('/admin/forgot-password',data).then(res =>{
             if(res.data.success === true ){
-                console.log(res.data.link)
                 Notiflix.Report.success('Get Link Successfully',`Password reset link has been sent to your Email: "${resetPassInput.email}"`, 'Cancel');
             }
         }).catch((error)=>{

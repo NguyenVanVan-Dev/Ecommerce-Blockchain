@@ -30,7 +30,6 @@ const ResetPassword = () =>{
             };
             axios.put('/admin/reset-password',data).then(res =>{
                 if(res.data.success === true ){
-                    console.log(res.data);
                     localStorage.setItem('auth_name',res.data.info.name);
                     localStorage.setItem('auth_token',res.data.accessToken);
                     setLoginInput({...loginInput,error_list:[]});

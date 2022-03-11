@@ -1,13 +1,13 @@
 const User = require('../Models/Users')
 const argon2 = require('argon2');
 var jwt = require('jsonwebtoken');
+const sendMailOgani = require('../Middleware/SendMail');
 require('dotenv').config();
 
 class AuthController {
 
     //[POST]  
     //path /admin/register  
-    //des  register admin
     async register(req,res){ 
         const {name, password, email,phone} = req.body;
         const user = await User.findOne({ email })
@@ -47,7 +47,6 @@ class AuthController {
     }
     //[POST]  
     //path /admin/login
-    //des login admin
     async login (req, res,next){
         const {email, password} = req.body;
         try {
@@ -76,7 +75,9 @@ class AuthController {
             res.status(500).json({success:false,message:"Internal Server Error"})
         }
     }
-    async loginGooogle(req,res){
+    //[POST]  
+    //path /admin/loginGoogle
+    async loginGoogle(req,res){
         const {id} = req.body;
         const accessToken = jwt.sign({userId: id},process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '3h'});
             res.json({
@@ -85,49 +86,51 @@ class AuthController {
                 accessToken
         });
     }
+    //[POST]  
+    //path /admin/forgot-password
     async forgotPassword(req,res){
         const {email } = req.body;
-        User.findOne({email},(err,user)=>{
-            if(err || !user)
+        var resetAccountToken;
+        const user = await User.findOne({ email })
+        if(!user){
+            return res.status(400).json({success:false, message:"User with this email does not exits."})
+        }
+        resetAccountToken = jwt.sign({userId: user._id},process.env.RESET_PASSWORD_SECRET,{ expiresIn: '20m'});
+        user.updateOne({resetLink:resetAccountToken}, (err,success)=>{
+            if(err)
             {
-               return  res.status(400).json({message: " User with this email does not exits."})
+                return  res.status(400).json({message: " Reset link error"})
             }
-            const resetAccountToken = jwt.sign({userId: user._id},process.env.RESET_PASSWORD_SECRET,{ expiresIn: '20m'});
-
-            return user.updateOne({resetLink:resetAccountToken}, (err,success)=>{
-                if(err)
-                {
-                    return  res.status(400).json({message: " Reset link error"})
-                }
-                res.status(200).json({success:true,link: `http://localhost:2106/admin/reset-password/${resetAccountToken}`});
-            })
         })
+        var bodyEmail = `<a href="http://localhost:2106/admin/reset-password/${resetAccountToken}">Reset Link !</a>`;
+        sendMailOgani('nvvan.0901.developer@gmail.com',bodyEmail)
+        res.status(200).json({success:true});
     }
+    //[POST]  
+    //path /admin/reset-password
     async resetPassword(req,res){
         const  {token, password} = req.body;
         const hashPassword = await argon2.hash(password)
+        let account = await User.findOne({resetLink:token});
         jwt.verify(token,process.env.RESET_PASSWORD_SECRET,(err,decodeData)=>{
-            if(err)
-            {
+            if(err){
                 return res.status(403).json({success:false,message:"Incorret token or token it is expried"})
             }
-            User.findOne({token},(err,user)=>{
-                if(err || !user)
+            const {name,email,phone} = account;
+            if(!account){
+                return  res.status(400).json({message: " User with this token does not exits."})
+            }
+            User.updateOne( {_id:account._id}, {$set : {password:hashPassword}},(err,success)=>{
+                if(err)
                 {
-                   return  res.status(400).json({message: " User with this token does not exits."})
+                    return  res.status(400).json({message: " Reset link error",error:err})
                 }
-                const {email,name,phone,_id} = user;
-                user.updateOne({password:hashPassword},(err,success)=>{
-                    if(err)
-                    {
-                        return  res.status(400).json({message: " Reset link error",error:err})
-                    }
-                    const accessToken = jwt.sign({userId: _id}, process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '3h'});
-                    res.status(200).json({success:true,message:'Your password has been changed',accessToken,info:{name,email,phone}});
-                })
+                const accessToken = jwt.sign({userId: account._id}, process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '3h'});
+                res.status(200).json({success:true,message:'Your password has been changed',accessToken,info:{name,email,phone}});
             })
         })
     }
+  
 }
 
 
