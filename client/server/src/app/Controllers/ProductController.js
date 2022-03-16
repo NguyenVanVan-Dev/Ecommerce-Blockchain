@@ -25,7 +25,7 @@ class ProductController {
         await productSave.save()
                 .then((result)=>{
                     console.log(result); 
-                    res.status(200).json({success:true,message:"Add Product Successfully "});
+                    res.status(200).json({success:true,id:result._id,message:"Add Product Successfully "});
                 })
                 .catch((error)=>{
                     const unlinkAsync = promisify(fs.unlink);
