@@ -1,7 +1,8 @@
 import React from "react";
 import logo from '../../Resource/UserInterface/img/logo.png';
-import { Link, useNavigate} from "react-router-dom";
-const Header = () =>{
+import { Link} from "react-router-dom";
+const Header = ({cartItems}) =>{
+    const subTotal = cartItems.reduce((total,item)=>total+ item.price * item.quantity,0)
     return (
         <header className="header">
             <div className="header__top">
@@ -45,18 +46,22 @@ const Header = () =>{
             <div className="row">
                 <div className="col-lg-3">
                 <div className="header__logo">
-                    <a href="./index.html"><img src={logo} alt="" /></a>
+                    <Link  to="/"><img src={logo} alt="" /></Link>
                 </div>
                 </div>
                 <div className="col-lg-6">
                 <nav className="header__menu">
                     <ul>
-                    <li className="active"><a href="./index.html">Home</a></li>
+                    <li className="active">
+                        <Link to="/">Home</Link>
+                    </li>
                     <li><a href="./shop-grid.html">Shop</a></li>
                     <li><a href="#">Pages</a>
                         <ul className="header__menu__dropdown">
                         <li><a href="./shop-details.html">Shop Details</a></li>
-                        <li><a href="./shoping-cart.html">Shoping Cart</a></li>
+                        <li>
+                            <Link to="/cart">Shoping Cart</Link>
+                        </li>
                         <li><a href="./checkout.html">Check Out</a></li>
                         <li><a href="./blog-details.html">Blog Details</a></li>
                         </ul>
@@ -70,9 +75,9 @@ const Header = () =>{
                 <div className="header__cart">
                     <ul>
                     <li><a href="#"><i className="fa fa-heart" /> <span>1</span></a></li>
-                    <li><a href="#"><i className="fa fa-shopping-bag" /> <span>3</span></a></li>
+                    <li><Link to="/cart"><i className="fa fa-shopping-bag" /> <span>{cartItems.length === 0 ?  0 : cartItems.length}</span></Link></li>
                     </ul>
-                    <div className="header__cart__price">item: <span>$150.00</span></div>
+                    <div className="header__cart__price">payment: <span>{subTotal.toLocaleString('vi-VN', {style: 'currency',currency: 'VND'})}</span></div>
                 </div>
                 </div>
             </div>

@@ -3,8 +3,8 @@ import axios from 'axios';
 import Notiflix from 'notiflix';
 import $ from 'jquery';
 import mixitup from 'mixitup';
-const FeaturedProduct = () => {
-    
+import { Link } from "react-router-dom";
+const FeaturedProduct = ({handleAddCart}) => {
     const [products,setProduct] = useState([]);
     const [categories,setCategory] = useState([]);
     useEffect(() => {
@@ -47,7 +47,6 @@ const FeaturedProduct = () => {
             })
     }, []);
 
-
     return (
         <section className="featured spad">
             <div className="container">
@@ -77,7 +76,11 @@ const FeaturedProduct = () => {
                                     <ul className="featured__item__pic__hover">
                                         <li><a href="#"><i className="fa fa-heart" /></a></li>
                                         <li><a href="#"><i className="fa fa-retweet" /></a></li>
-                                        <li><a href="#"><i className="fa fa-shopping-cart" /></a></li>
+                                        <li onClick={()=>{
+                                            handleAddCart(product)
+                                        }}>
+                                            <Link to=""><i className="fa fa-shopping-cart" /></Link>
+                                        </li>
                                     </ul>
                                     </div>
                                     <div className="featured__item__text">

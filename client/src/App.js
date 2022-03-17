@@ -1,6 +1,6 @@
 
 import { Routes, Route} from "react-router-dom";
-
+import React,{useState} from "react";
 import Login from "./Components/Manage/Auth/Login";
 import Register from "./Components/Manage/Auth/Register";
 import MasterLayout from "./Layout/Manage/MasterLayout";
@@ -16,6 +16,8 @@ import ListProduct from "./Components/Manage/Webpage/Product/ListProduct";
 import DetailProduct from "./Components/Manage/Webpage/Product/DetailProduct";
 import ForgotPassword from "./Components/Manage/Auth/ForgotPassword";
 import ResetPassword from "./Components/Manage/Auth/ResetPassword";
+import Cart from "./Components/User/WebPage/Cart";
+import Home from "./Components/User/WebPage/Home";
 axios.defaults.baseURL = 'http://localhost:2105/';
 axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
 axios.defaults.headers.post['Accept'] = 'application / json';
@@ -30,11 +32,29 @@ axios.interceptors.request.use( function(config){
 });
 
 function App() {
+    const [cartItems, setCartItems] = useState([]);
+    const handleAddCart = (product) =>{
+        const ProductExits = cartItems.find((item)=> item._id === product._id);
+        if(ProductExits)
+        {
+            setCartItems(
+                cartItems.map((item)=> 
+                    item._id === product._id ? {...ProductExits,quantity:ProductExits.quantity +1} : item
+                )
+            )
+        }else {
+            setCartItems([...cartItems,{...product,quantity:1}]);
+        }
+        localStorage.setItem('cart', { "name" : " nai meo"});
+    }
+    const handleClearCart = ()=> setCartItems([]);
     return (
         <div className="App">
         <Routes>
-            {/* <Route path="/" element={<Home/>} /> */}
-            <Route path="/" element={<MasterLayoutUI/>} />
+            <Route path="/" element={<MasterLayoutUI cartItems={cartItems}/>} >
+                <Route path="/" element={<Home handleAddCart={handleAddCart}  />} />
+                <Route path="cart" element={<Cart cartItems={cartItems} handleAddCart={handleAddCart} handleClearCart={handleClearCart} />} />
+            </Route>
             <Route path="/admin/login" element = {<Login/>} />
             <Route path="/admin/register" element = {<Register/>} />
             <Route path="/admin/forgot-password" element = {<ForgotPassword/>} />

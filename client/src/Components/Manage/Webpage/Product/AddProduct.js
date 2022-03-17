@@ -32,7 +32,7 @@ function AddProduct() {
         provider: null,
         web3: null,
         contract: null,
-      });
+    });
     
     const [account, setAccount] = useState(null);
     useEffect(()=>{
@@ -81,17 +81,20 @@ function AddProduct() {
         web3Api.web3 && getAccount()
     }, [web3Api.web3]);
     const Transfers = async (id) =>{
-        const { web3 } = web3Api
+        const {contract, web3 } = web3Api
         const amount = web3.utils.toWei(priceTotalETH.toString(), "ether")
-        web3.eth.sendTransaction({from: account , to:"0x2Eb4D6A5dd11A8279d27AfD781C2A04BA846DC75",value:amount})
-                                 .then((_transfer)=>{
-                                    setProductInput({name:'',desc:'',slug:'',keyword:'',price:'',qty:'',image:'',category_id:0,display:1,type_display:1,error_list:[],});
-                                 })
-                                 .catch((err)=>{
-                                    console.log(err); 
-                                    Notiflix.Report.failure("Meta Mark Notification",err.message, 'Cancel');
-                                    deleteProduct(id);
-                                 })
+        await contract.transferMoneyTo("0x9051f2339d358A6bA5a8723f48606b17dDb1030E",amount,{
+                from:account,
+                value:amount
+            })
+            .then((_transfer)=>{
+                setProductInput({name:'',desc:'',slug:'',keyword:'',price:'',qty:'',image:'',category_id:0,display:1,type_display:1,error_list:[],});
+            })
+            .catch((err)=>{
+                console.log(err);
+                Notiflix.Report.failure("Meta Mark Notification",err.message, 'Cancel');
+                deleteProduct(id);
+            })
     }
     const handleInput = (e)=>{
         setProductInput({
