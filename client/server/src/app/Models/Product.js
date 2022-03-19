@@ -32,7 +32,7 @@ const productSchema = new Schema({
     },
     category_id:{
         type: String,
-        default: 0,
+        default: 1,
     },
     image:{
         type:String,
@@ -42,6 +42,10 @@ const productSchema = new Schema({
         type:Number,
         default:1
     },
+    wallet:{
+        type:String,
+        required:[true,'Please select supplier for Product!']
+    }
 },{
     timestamps:true
 });

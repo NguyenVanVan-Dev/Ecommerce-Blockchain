@@ -84,9 +84,30 @@ const Sidebar = () =>{
         </li>
         {/* Nav Item - Charts */}
         <li className="nav-item">
-            <Link to={"/admin/profile"} className="nav-link" >
-            <i className="fas fa-fw fa-chart-area" />
-            <span>Charts</span></Link>
+            <a className="nav-link collapsed" href="#" data-toggle="collapse" data-target="#Contract" aria-expanded="true" aria-controls="collapsePages">
+            <i className="fas fa-file-contract"></i>
+            <span>Contract & Supplier</span>
+            </a>
+            <div id="Contract" className="collapse" aria-labelledby="headingTransaction" data-parent="#accordionSidebar">
+            <div className="bg-white py-2 collapse-inner rounded">
+                <h6 className="collapse-header">Contract Page:</h6>
+                <Link className="collapse-item" to="add-contract">Add Contract</Link>
+                <Link className="collapse-item" to="list-contract">List Contract</Link>
+            </div>
+            </div>
+        </li>
+        {/* Nav Item - Transaction History */}
+        <li className="nav-item">
+            <a className="nav-link collapsed" href="#" data-toggle="collapse" data-target="#transationHistory" aria-expanded="true" aria-controls="collapsePages">
+            <i className="fab fa-buffer"></i>
+            <span>Transaction History</span>
+            </a>
+            <div id="transationHistory" className="collapse" aria-labelledby="headingTransaction" data-parent="#accordionSidebar">
+            <div className="bg-white py-2 collapse-inner rounded">
+                <h6 className="collapse-header">Transaction Page:</h6>
+                <Link className="collapse-item" to="list-transaction">List Transaction</Link>
+            </div>
+            </div>
         </li>
         {/* Nav Item - Tables */}
         <li className="nav-item">

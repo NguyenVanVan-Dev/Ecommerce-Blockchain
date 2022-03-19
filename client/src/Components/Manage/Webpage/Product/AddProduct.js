@@ -12,6 +12,7 @@ function AddProduct() {
     const [priceTotalVND, setTotalVND] = useState();
     const [priceTotalETH, setTotalETH] = useState();
     const [categories,setCategory] = useState([]);
+    const [contracts,setContract] = useState();
     const [productInput, setProductInput] = useState({
         name:'',
         desc:'',
@@ -23,6 +24,7 @@ function AddProduct() {
         image:'',
         display:1,
         type_display:1,
+        supplier:'',
         error_list:{},
     })
     const [imageReview,setImageReview] = useState({
@@ -34,14 +36,15 @@ function AddProduct() {
         contract: null,
     });
     const [account, setAccount] = useState(null);
+    // Show Price ETH
     useEffect(() => {
         fetch("https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=ETH,VND")
         .then(response => response.json())
         .then(data => {
           setPriceETH(data.VND)
-          console.log((data.VND).toLocaleString('vi-VN', {style: 'currency',currency: 'VND'}))
         });
     }, []);
+    // Show Select List Category 
     useEffect(()=>{
         axios.get('/category/show',{ 
             params : { 
@@ -56,17 +59,29 @@ function AddProduct() {
             Notiflix.Report.failure("Category not Found","please come back later" , 'Cancel');
         })
     },[])
+    // Show Select List Contrat 
+    useEffect(()=>{
+        axios.get('/contract/show',{ 
+            }).then((res)=>{
+            if(res.data.success === true){
+                setContract(res.data.contract);
+            }
+        })
+        .catch((error)=>{
+            Notiflix.Report.failure("Contract not Found","please come back later" , 'Cancel');
+        })
+    },[])
+    // Calculation Money 
     useEffect(() => {
         setTotalVND(productInput.price * productInput.qty);
         setTotalETH(productInput.price * productInput.qty / parseFloat(priceETH));
     }, [productInput.price,productInput.qty]);
-    const setAccountLister = (provider) => {
-        provider.on("accountChanged", accounts => setAccount(accounts[0]))
-    }
+   
+    // Load Provider 
     useEffect(() => {
         const loadProvider = async () => {
           const provider = await detectEthereumProvider();
-          const contract = await loadContract("ProductSupplier", provider)
+          const contract = await loadContract("ManagerOgani", provider)
           if (provider) {
             setAccountLister(provider)
             setWeb3Api({
@@ -80,6 +95,7 @@ function AddProduct() {
         }
         loadProvider()
       }, []);
+    //Get Account
     useEffect(() => {
         const getAccount = async () => {
             const accounts = await web3Api.web3.eth.getAccounts()
@@ -87,15 +103,19 @@ function AddProduct() {
         }
         web3Api.web3 && getAccount()
     }, [web3Api.web3]);
+    const setAccountLister = (provider) => {
+        provider.on("accountChanged", accounts => setAccount(accounts[0]))
+    }
     const Transfers = async (id) =>{
         const {contract, web3 } = web3Api
-        const amount = web3.utils.toWei(priceTotalETH.toString(), "ether")
-        await contract.transferMoneyTo("0x9051f2339d358A6bA5a8723f48606b17dDb1030E",amount,{
+        const amount = web3.utils.toWei(priceTotalETH.toString(), "ether");
+        let   addressSupplier = productInput.supplier;
+        await contract.transferToSupplier(id,addressSupplier.toString(),{
                 from:account,
                 value:amount
             })
             .then((_transfer)=>{
-                setProductInput({name:'',desc:'',slug:'',keyword:'',price:'',qty:'',image:'',category_id:0,display:1,type_display:1,error_list:[],});
+                setProductInput({name:'',desc:'',slug:'',keyword:'',price:'',qty:'',image:'',category_id:0,display:1,type_display:1,supplier:'',error_list:[],});
             })
             .catch((err)=>{
                 console.log(err);
@@ -166,6 +186,7 @@ function AddProduct() {
 		formData.append('category_id', productInput.category_id);
 		formData.append('image', productInput.image);
 		formData.append('price', productInput.price);
+		formData.append('wallet', productInput.supplier);
 		formData.append('qty', productInput.qty);
         axios.post('/product/store',formData).then(res =>{
                 if(res.data.success === true )
@@ -292,14 +313,18 @@ function AddProduct() {
                                         <p>  Image : <i className="name_image"></i></p>
                                     </div>}
                                     <div className="form-group row">
-                                        <div className="col-sm-6 mb-3 mb-sm-0">
-                                            <input type="text" onChange={handleInput} value={productInput.receive_email} name="receive_email" className="form-control form-control-user" id="exampleFirstName" placeholder="Enter Email Import Unit" />
-                                            {/* <span className="text-danger small">{productInput.error_list.name}</span> */}
-                                        </div>
                                         <div className="col-sm-6">
-                                            <input type="text" onChange={handleInput} value={productInput.receive_wallet_address} name="receive_wallet_address" className="form-control form-control-user"  placeholder="Enter Wallet Address Import Unit" />
-                                            {/* <span className="text-danger small">{productInput.error_list.slug}</span> */}
-                                        </div>                                      
+                                            <label htmlFor="SelectAnHien">Chose Contract Supplier</label>
+                                            <select name="supplier"  value={productInput.supplier} onChange={handleInput}  className="form-control input-sm  inputform">
+                                                <option value={0} className="optionform">---Chose Supplier---</option>
+                                                {contracts ? contracts.map((contract)=>{
+                                                    return (
+                                                        <option key={contract._id} value={contract.wallet} className="optionform">{contract.name}</option>
+                                                    )
+                                                }) : " "}
+                                            </select>
+                                            <span className="text-danger small">{productInput.error_list.wallet}</span>
+                                        </div>                                
                                     </div>
                                     <div className="form-group text-center" >
                                         <p>  Price Total Viet Nam : <i className="price_token"> {priceTotalVND ? priceTotalVND.toLocaleString('vi-VN', {style: 'currency',currency: 'VND'}) : ""} </i></p>

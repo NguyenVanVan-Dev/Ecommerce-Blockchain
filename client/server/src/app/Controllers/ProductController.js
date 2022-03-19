@@ -9,7 +9,7 @@ class ProductController {
     //[POST] /product/store
     async store(req, res){
         let listError = {};
-        const {name, keyword, desc,display,slug,category_id,price,qty,type} = req.body;
+        const {name, keyword, desc,display,slug,category_id,price,qty,type,wallet} = req.body;
         const productSave  = new productModle({ 
                 name,
                 keyword,
@@ -19,6 +19,7 @@ class ProductController {
                 category_id,
                 price,
                 qty,
+                wallet,
                 type_display:type,
                 image: req.file ? req.file.filename : ''
         });
@@ -28,6 +29,7 @@ class ProductController {
                     res.status(200).json({success:true,id:result._id,message:"Add Product Successfully "});
                 })
                 .catch((error)=>{
+                    console.log(error.errors);
                     const unlinkAsync = promisify(fs.unlink);
                     if(req.file)
                     {
@@ -41,6 +43,7 @@ class ProductController {
                         slug:error.errors.slug ? error.errors.slug.message  : '',
                         price:error.errors.price ? error.errors.price.message  : '',
                         qty:error.errors.qty ? error.errors.qty.message  : '',
+                        wallet:error.errors.wallet ? error.errors.wallet.message  : '',
                         image:error.errors.image ? error.errors.image.message  : '',
                     };
                     res.status(400).json({success:false,message:"Add Product Failure!",listError});

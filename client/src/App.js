@@ -18,6 +18,9 @@ import ForgotPassword from "./Components/Manage/Auth/ForgotPassword";
 import ResetPassword from "./Components/Manage/Auth/ResetPassword";
 import Cart from "./Components/User/WebPage/Cart";
 import Home from "./Components/User/WebPage/Home";
+import ListTransaction from "./Components/Manage/Webpage/Transaction/ListTransaction";
+import AddContract from "./Components/Manage/Webpage/Contract/AddContract";
+import ListContract from "./Components/Manage/Webpage/Contract/ListContract";
 axios.defaults.baseURL = 'http://localhost:2105/';
 axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
 axios.defaults.headers.post['Accept'] = 'application / json';
@@ -78,6 +81,9 @@ function App() {
                 <Route path="add-product" element={<AddProduct/>} />
                 <Route path="list-product" element={<ListProduct/>} />
                 <Route path="product/:id" element={<DetailProduct/>} />  
+                <Route path="list-transaction" element={<ListTransaction/>} />  
+                <Route path="add-contract" element={<AddContract/>} />
+                <Route path="list-contract" element={<ListContract/>} />
             </Route>
         </Routes>
         </div>

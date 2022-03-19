@@ -73,7 +73,7 @@ const AddCategory = ()=>{
                                         </div>
                                     </div>
                                     <div className="form-group">
-                                        <textarea type="text"  id="editor" onChange={handleInput} value={categoryInput.desc} name="desc" rows={10}  className="form-control" id="exampleInputEmail"
+                                        <textarea type="text"  onChange={handleInput} value={categoryInput.desc} name="desc" rows={10}  className="form-control" id="exampleInputEmail"
                                             placeholder="Category Description"/>
                                         <span className="text-danger small">{categoryInput.error_list.desc}</span>
                                     </div>
