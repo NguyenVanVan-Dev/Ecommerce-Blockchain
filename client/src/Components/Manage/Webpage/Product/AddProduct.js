@@ -6,9 +6,9 @@ import $ from 'jquery'
 import Web3 from 'web3';
 import detectEthereumProvider from '@metamask/detect-provider';
 import {loadContract} from '../../../../utilis/load-contracts';
-import e from "cors";
+
 function AddProduct() {
-    const [priceETH, setPriceETH] = useState("57788940");
+    const [priceETH, setPriceETH] = useState("");
     const [priceTotalVND, setTotalVND] = useState();
     const [priceTotalETH, setTotalETH] = useState();
     const [categories,setCategory] = useState([]);
@@ -26,15 +26,22 @@ function AddProduct() {
         error_list:{},
     })
     const [imageReview,setImageReview] = useState({
-        src: '',
+        src: null,
     });
     const [web3Api, setWeb3Api] = useState({
         provider: null,
         web3: null,
         contract: null,
     });
-    
     const [account, setAccount] = useState(null);
+    useEffect(() => {
+        fetch("https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=ETH,VND")
+        .then(response => response.json())
+        .then(data => {
+          setPriceETH(data.VND)
+          console.log((data.VND).toLocaleString('vi-VN', {style: 'currency',currency: 'VND'}))
+        });
+    }, []);
     useEffect(()=>{
         axios.get('/category/show',{ 
             params : { 
@@ -194,22 +201,22 @@ function AddProduct() {
                                 <div className="text-center">
                                     <h1 className="h4 text-gray-900 mb-2">Add  Product</h1>
                                 </div>
-                                <div className="">
-                                    <Link to={'/admin/list-product'} className="btn btn-primary mb-4">List Product</Link>
+                                <div className="mb-4 d-flex justify-content-between">
+                                    <Link to={'/admin/list-product'} className="btn btn-primary ">List Product</Link>
+                                    <button onClick={()=>web3Api.provider.request({ method:'eth_requestAccounts'})} className="btn btn-primary btn-user">
+                                        Connect Metamask
+                                    </button>
                                 </div>
                                 <div className="row mb-2">
-                                    <div className="col-sm-3">
-                                        <button onClick={()=>web3Api.provider.request({ method:'eth_requestAccounts'})} className="btn btn-primary btn-user">
-                                            Connect Metamask
-                                        </button>
-                                    </div>
                                     <div className="col-sm-9 d-flex agline-items-center">
-                                    <strong>Account Address : </strong>
+                                        <strong>Account Address : </strong>
                                         <p className="account_number m-0 ml-4">
                                         { account ? account : "Account Denined"}
                                         </p>
                                     </div>
-                                  
+                                    <div className="col-sm-3">
+                                        <strong>Price ETH:</strong> {priceETH && priceETH.toLocaleString('vi-VN', {style: 'currency',currency: 'VND'})} 
+                                    </div>
                                 </div>
                                 <form className="user">
                                     <div className="form-group row">
@@ -280,10 +287,10 @@ function AddProduct() {
                                                 </select>
                                         </div>
                                     </div>
-                                    <div className="form-group text-center" >
+                                    {imageReview.src &&  <div className="form-group text-center" >
                                         <img src={imageReview.src} id='review-image' className=" img-thumbnail w-50" alt="..."/>
                                         <p>  Image : <i className="name_image"></i></p>
-                                    </div>
+                                    </div>}
                                     <div className="form-group row">
                                         <div className="col-sm-6 mb-3 mb-sm-0">
                                             <input type="text" onChange={handleInput} value={productInput.receive_email} name="receive_email" className="form-control form-control-user" id="exampleFirstName" placeholder="Enter Email Import Unit" />

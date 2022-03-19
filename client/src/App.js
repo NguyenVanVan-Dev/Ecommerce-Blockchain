@@ -32,28 +32,38 @@ axios.interceptors.request.use( function(config){
 });
 
 function App() {
-    const [cartItems, setCartItems] = useState([]);
+    const [cartItems, setCartItems] = useState(()=>{
+        const storageCart = JSON.parse(localStorage.getItem('cart'));
+        return storageCart ?? [];
+    });
     const handleAddCart = (product) =>{
         const ProductExits = cartItems.find((item)=> item._id === product._id);
         if(ProductExits)
         {
-            setCartItems(
-                cartItems.map((item)=> 
+            setCartItems(prev => {
+                const newCart = prev.map((item)=> 
                     item._id === product._id ? {...ProductExits,quantity:ProductExits.quantity +1} : item
                 )
-            )
+                console.log(JSON.stringify(newCart));
+                localStorage.setItem('cart',JSON.stringify(newCart));
+                return newCart;
+            })
         }else {
-            setCartItems([...cartItems,{...product,quantity:1}]);
+            setCartItems(prev => {
+                const newCart =  [...prev,{...product,quantity:1}]
+                localStorage.setItem('cart',JSON.stringify(newCart));
+                return newCart;
+            });
         }
-        localStorage.setItem('cart', { "name" : " nai meo"});
+        
     }
-    const handleClearCart = ()=> setCartItems([]);
+   
     return (
         <div className="App">
         <Routes>
             <Route path="/" element={<MasterLayoutUI cartItems={cartItems}/>} >
                 <Route path="/" element={<Home handleAddCart={handleAddCart}  />} />
-                <Route path="cart" element={<Cart cartItems={cartItems} handleAddCart={handleAddCart} handleClearCart={handleClearCart} />} />
+                <Route path="cart" element={<Cart setCartItems={setCartItems} cartItems={cartItems}/>} />
             </Route>
             <Route path="/admin/login" element = {<Login/>} />
             <Route path="/admin/register" element = {<Register/>} />

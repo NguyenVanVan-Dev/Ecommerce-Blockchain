@@ -1,23 +1,34 @@
 import React,{useEffect,useState} from 'react';
+import { Link } from 'react-router-dom';
 import $ from 'jquery';
-const Cart = ({cartItems,handleAddCart ,handleClearCart}) => {
+const Cart = ({cartItems,setCartItems}) => {
     const [priceETH, setPriceETH] = useState("57788940");
-    const [cartItem, setCartItems] = useState(cartItems);
     useEffect(() => {
         $('.set-bg').each(function () {
             var bg = $(this).data('setbg');
             $(this).css('background-image', 'url(' + bg + ')');
         });
-        
     });
     const handleQty = (e,id)=>{
-        setCartItems(
-            cartItem.map((item)=> 
-                item._id === id ? {...item,quantity:e.target.value} : item
-            )
-        )
+        setCartItems(prev => {
+                const newCart = prev.map((item)=> item._id === id ? {...item,quantity:parseInt(e.target.value)} : item)
+                console.log(JSON.stringify(newCart));
+                localStorage.setItem('cart',JSON.stringify(newCart));
+                return newCart;
+        });
+    };
+    const handleClearCart = ()=> {
+        setCartItems([]);
+        localStorage.removeItem('cart');
+    };
+    const handleRemoveItemCart = (id)=>{
+        setCartItems(prev => {
+            const newCart = prev.filter((item)=> item._id !== id)
+            localStorage.setItem('cart',JSON.stringify(newCart));
+            return newCart;
+        });
     }
-    const subTotal = cartItem.reduce((total,item)=>total+ item.price * item.quantity,0)
+    const subTotal = cartItems.reduce((total,item)=>total+ item.price * item.quantity,0)
     return (
         <div>
             <section className="breadcrumb-section set-bg" data-setbg="UI/img/breadcrumb.jpg">
@@ -51,7 +62,7 @@ const Cart = ({cartItems,handleAddCart ,handleClearCart}) => {
                                         </tr>
                                     </thead>
                                 <tbody>
-                                    { cartItem.length === 0 && (
+                                    { cartItems.length === 0 && (
                                         <tr >
                                             <td colSpan={"5"}> No Items </td>
                                         </tr>
@@ -59,7 +70,7 @@ const Cart = ({cartItems,handleAddCart ,handleClearCart}) => {
 
                                     }
                                     {
-                                        cartItem.map((item)=>(
+                                        cartItems.map((item)=>(
                                             <tr key={item._id}>
                                                 <td className="shoping__cart__item">
                                                     <img src={`/uploads/${item.image}`} alt="" />
@@ -79,7 +90,7 @@ const Cart = ({cartItems,handleAddCart ,handleClearCart}) => {
                                                    {(item.price * item.quantity).toLocaleString('vi-VN', {style: 'currency',currency: 'VND'}) }
                                                 </td>
                                                 <td className="shoping__cart__item__close">
-                                                    <span className="icon_close" />
+                                                    <span className="icon_close" onClick={()=> handleRemoveItemCart(item._id)} />
                                                 </td>
                                             </tr>
                                         ))
@@ -94,7 +105,7 @@ const Cart = ({cartItems,handleAddCart ,handleClearCart}) => {
                         <div className="col-lg-12">
                         <div className="shoping__cart__btns">
                             <a href="#" className="primary-btn cart-btn">CONTINUE SHOPPING</a>
-                            <button className="primary-btn cart-btn cart-btn-right" onClick={() => setCartItems([])} >Clear Cart</button>
+                            <Link to={""} className="primary-btn cart-btn cart-btn-right" onClick={handleClearCart} >Clear Cart</Link>
                         </div>
                         </div>
                         <div className="col-lg-6">

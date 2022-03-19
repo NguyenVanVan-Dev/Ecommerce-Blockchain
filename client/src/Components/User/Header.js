@@ -1,4 +1,4 @@
-import React from "react";
+import React ,{useLayoutEffect,useState} from "react";
 import logo from '../../Resource/UserInterface/img/logo.png';
 import { Link} from "react-router-dom";
 const Header = ({cartItems}) =>{
