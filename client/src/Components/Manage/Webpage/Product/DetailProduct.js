@@ -3,6 +3,7 @@ import {Link,useParams} from "react-router-dom";
 import axios  from "axios";
 import Notiflix from 'notiflix';
 import $ from 'jquery';
+import productApi from '../../../../Api/productApi'
 function DetailProduct() {
     const { id } = useParams();
     const [productInput, setProductInput] = useState({
@@ -19,7 +20,7 @@ function DetailProduct() {
         error_list:{},
     });
     const [categories,setCategory] = useState([]);
-    const [imageReview,setImageReview] = useState({src: '',file:''});
+    const [imageReview,setImageReview] = useState({src: '',file:'',name:''});
     useEffect(()=>{
         axios.get('/category/show',{ params : { whoCall: 'admin'} })
             .then((res)=>{
@@ -31,30 +32,38 @@ function DetailProduct() {
                 Notiflix.Report.failure("Category not Found","please come back later" , 'Cancel');
             })
     },[]);
-    useEffect(()=>{
-        axios.get('/product/detail',{ params : { id } })
-            .then(res =>{
-                if(res.data.success === true){
-                    setProductInput({
-                        ...productInput,
-                        name:res.data.product.name,
-                        desc:res.data.product.desc,
-                        slug:res.data.product.slug,
-                        keyword:res.data.product.keyword,
-                        display:res.data.product.display,
-                        price:res.data.product.price,
-                        qty:res.data.product.qty,
-                        category_id:res.data.product.category_id,
-                        image:res.data.product.image,
-                        type_display:res.data.product.type_display,
-                        error_list:[],
-                    }); 
-                    setImageReview({ src: '/uploads/'+res.data.product.image });
-                }
-            }).catch((error)=>{
-                Notiflix.Report.failure(error.response.data.message,`No product found with id "${id}" ` , 'Cancel');
-            })
-    },[]);
+    useEffect(() => {
+        const fetchProductDetail = async () => {
+            try {
+                const params = {id}
+                await productApi.detail(params)
+                .then(res =>{
+                    if(res.success === true){
+                        setProductInput({
+                            ...productInput,
+                            name:res.product.name,
+                            desc:res.product.desc,
+                            slug:res.product.slug,
+                            keyword:res.product.keyword,
+                            display:res.product.display,
+                            price:res.product.price,
+                            qty:res.product.qty,
+                            category_id:res.product.category_id,
+                            image:res.product.image,
+                            type_display:res.product.type_display,
+                            error_list:[],
+                        }); 
+                        setImageReview({ src: '/uploads/'+res.product.image });
+                    }
+                }).catch((error)=>{
+                    Notiflix.Report.failure(error.response.data.message,`No product found with id "${id}" ` , 'Cancel');
+                })
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        fetchProductDetail();
+    }, []);
     const handleInput = (e)=>{
         setProductInput({...productInput,[e.target.name]: e.target.value})
     }
@@ -70,33 +79,25 @@ function DetailProduct() {
     const changeHandleFile = (e) => {
         const file = e.target.files[0];
         file.preview = URL.createObjectURL(file)
-        setImageReview({src: file.preview,file:e.target.files[0] }); 
-        $('.name_image').text(e.target.files[0].name);
+        setImageReview({src: file.preview,file:e.target.files[0] ,name :e.target.files[0].name}); 
+        
 	};
-    const handelSubmit = (e)=>{
+    const handelSubmit = async (e)=>{
         e.preventDefault();
         const formData = new FormData();
-
-		formData.append('name', productInput.name);
-		formData.append('desc', productInput.desc);
-		formData.append('slug', productInput.slug);
-		formData.append('keyword', productInput.keyword);
-		formData.append('display', productInput.display);
-		formData.append('type', productInput.type_display);
-		formData.append('category_id', productInput.category_id);
-		formData.append('image', imageReview.file);
-		formData.append('price', productInput.price);
-		formData.append('qty', productInput.qty);
-		formData.append('old_image', productInput.image);
+        for (const property in productInput) {
+            formData.append(property, productInput[property]);
+        }
 		formData.append('id', id);
-
-        axios.put('/product/update',formData).then(res =>{
-            if(res.data.success === true)
+		formData.append('new_image', imageReview.file);
+        
+        await productApi.update(formData)
+        .then(res =>{
+            if(res.success === true)
             {
-                Notiflix.Report.success(res.data.message,"Product has been updated to the database" , 'Cancel');
+                Notiflix.Report.success(res.message,"Product has been updated to the database" , 'Cancel');
             }
         }).catch((error)=>{
-            console.log(error.response)
             if(error.response.data.error){
                 Notiflix.Report.failure(error.response.data.message,error.response.data.error , 'Cancel');
             }
@@ -119,9 +120,15 @@ function DetailProduct() {
                             <div className="text-center">
                                 <h1 className="h4 text-gray-900 mb-4">Edit  Product</h1>
                             </div>
-                            <div className="">
-                                <Link to={'/admin/list-product'} className="btn btn-primary mb-4">List Product</Link>
-                                <Link to={'/admin/add-product'} className="btn btn-success mb-4 ml-4">Add Product</Link>
+                            <div className="d-flex justify-content-between ">
+                                <div>
+                                    <Link to={'/admin/list-product'} className="btn btn-primary mb-4">List Product</Link>
+                                    <Link to={'/admin/add-product'} className="btn btn-success mb-4 ml-4">Add Product</Link>
+                                </div>
+                                <div>
+                                    <strong className="text-danger ml-4">Note*: </strong>
+                                    <span className="text-warning">Price and quantity changes are not allowed at the time of receipt </span>
+                                </div>
                             </div>
                                 <form className="user">
                                     <div className="form-group row">
@@ -135,13 +142,19 @@ function DetailProduct() {
                                         </div>
                                     </div>
                                     <div className="form-group row">
-                                        <div className="col-sm-4 mb-3 mb-sm-0">
-                                            <input type="text" onChange={handleInput} value={productInput.qty} name="qty" min='0' max='100000' className="form-control form-control-user" id="exampleFirstName" placeholder="Product Quantity (Kg)" />
-                                            <span className="text-danger small">{productInput.error_list.qty}</span>
+                                        <div className="col-sm-4 mb-3 mb-sm-0 d-flex flex-column ">
+                                            <div className="ml-2">
+                                                <label htmlFor="Null">Quantity:</label>
+                                                <strong className="text-danger ml-4"> {productInput.qty} (Kg) </strong>
+                                            </div>
+                                            <span className="text-warning "> Can't change the quantity</span>
                                         </div>
-                                        <div className="col-sm-4">
-                                            <input type="text" onChange={handleInput} value={productInput.price} name="price" min='0'  className="form-control form-control-user"  placeholder="Product Price (VNĐ)" />
-                                            <span className="text-danger small">{productInput.error_list.price}</span>
+                                        <div className="col-sm-4 mb-3 mb-sm-0 d-flex flex-column ">
+                                            <div className="ml-2">
+                                                <label htmlFor="Null">Price:</label>
+                                                <strong className="text-danger ml-4"> {(productInput.price).toLocaleString('vi-VN', {style: 'currency',currency: 'VND'})} </strong>
+                                            </div>
+                                            <span className="text-warning ">Can't change the price</span>
                                         </div>
                                         <div className="col-sm-4 mb-3 mb-sm-0">
                                             <input type="text" onChange={handleInput} value={productInput.keyword} name="keyword" className="form-control form-control-user " id="exampleInputPassword" placeholder="Key Word" />

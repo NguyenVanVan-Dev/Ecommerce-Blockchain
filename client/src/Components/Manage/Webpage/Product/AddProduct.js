@@ -6,6 +6,7 @@ import $ from 'jquery'
 import Web3 from 'web3';
 import detectEthereumProvider from '@metamask/detect-provider';
 import {loadContract} from '../../../../utilis/load-contracts';
+import productApi from '../../../../Api/productApi';
 
 function AddProduct() {
     const [priceETH, setPriceETH] = useState("");
@@ -21,15 +22,12 @@ function AddProduct() {
         price:'',
         qty:'',
         category_id:0,
-        image:'',
         display:1,
         type_display:1,
-        supplier:'',
+        wallet:'',
         error_list:{},
     })
-    const [imageReview,setImageReview] = useState({
-        src: null,
-    });
+    const [imageReview,setImageReview] = useState({src: '',file:'',name:''});
     const [web3Api, setWeb3Api] = useState({
         provider: null,
         web3: null,
@@ -103,25 +101,31 @@ function AddProduct() {
         }
         web3Api.web3 && getAccount()
     }, [web3Api.web3]);
+    useEffect(() => {
+        return () => {
+            imageReview.src && URL.revokeObjectURL(imageReview.src);
+        };
+    }, [imageReview]);
     const setAccountLister = (provider) => {
         provider.on("accountChanged", accounts => setAccount(accounts[0]))
     }
     const Transfers = async (id) =>{
         const {contract, web3 } = web3Api
         const amount = web3.utils.toWei(priceTotalETH.toString(), "ether");
-        let   addressSupplier = productInput.supplier;
+        let   addressSupplier = productInput.wallet;
         await contract.transferToSupplier(id,addressSupplier.toString(),{
                 from:account,
                 value:amount
             })
             .then((_transfer)=>{
-                setProductInput({name:'',desc:'',slug:'',keyword:'',price:'',qty:'',image:'',category_id:0,display:1,type_display:1,supplier:'',error_list:[],});
+                setProductInput({name:'',desc:'',slug:'',keyword:'',price:'',qty:'',image:'',category_id:0,display:1,type_display:1,wallet:'',error_list:[],});
             })
             .catch((err)=>{
                 console.log(err);
                 Notiflix.Report.failure("Meta Mark Notification",err.message, 'Cancel');
                 deleteProduct(id);
             })
+        return false; // turnoff reload function for "multer" lib
     }
     const handleInput = (e)=>{
         setProductInput({
@@ -138,26 +142,18 @@ function AddProduct() {
         $('#image_product').trigger('click') 
     }
     const changeHandleFile = (e) => {
-        
-        const reader = new FileReader();
-        reader.onload = function(){
-            const result = reader.result;
-            setImageReview({src: result});
-        }
-        reader.readAsDataURL(e.target.files[0]);
-        $('.name_image').text(e.target.files[0].name);
-        setContentFile(e);
-	};
-    const setContentFile = (e)=>{
+        const file = e.target.files[0];
+        file.preview = URL.createObjectURL(file)
+        setImageReview({src: file.preview,file:e.target.files[0],name :e.target.files[0].name }); 
         setProductInput({
             ...productInput,
-            [e.target.name]: e.target.files[0],
+            [e.target.name]: e.target.value,
             error_list:{
                 ...productInput.error_list,
                 [e.target.name]: '',
             }
         })
-    }
+	};
     const handelSubmit = (e)=>{
         e.preventDefault();
         if(!account){
@@ -167,46 +163,45 @@ function AddProduct() {
                                 storeProduct();
                             })
                             .catch((err)=>{
-                                console.log(err.message)
-                                Notiflix.Report.failure("Meta Mark Notification",err.message, 'Cancel');
+                                console.log(err.response.data.message)
+                                Notiflix.Report.failure("Meta Mark Notification",err.response.data.message, 'Cancel');
                             })
         }else{
             storeProduct();
         }
-        return false; // turnoff reload function for "multer" lib
+      
     };
-    const storeProduct = ()=>{
+    const storeProduct = async ()=>{
         const formData = new FormData();
-		formData.append('name', productInput.name);
-		formData.append('desc', productInput.desc);
-		formData.append('slug', productInput.slug);
-		formData.append('keyword', productInput.keyword);
-		formData.append('display', productInput.display);
-		formData.append('type', productInput.type_display);
-		formData.append('category_id', productInput.category_id);
-		formData.append('image', productInput.image);
-		formData.append('price', productInput.price);
-		formData.append('wallet', productInput.supplier);
-		formData.append('qty', productInput.qty);
-        axios.post('/product/store',formData).then(res =>{
-                if(res.data.success === true )
-                {
-                    Transfers(res.data.id);
-                }
-            }).catch((error)=>{
-                if(error.response.data.error){
-                    Notiflix.Report.failure(error.response.data.message,error.response.data.error , 'Cancel');
-                }
-                if(error.response.data.listError){ 
-                    setProductInput((prev)=>{
-                        return {...prev,error_list: error.response.data.listError}
-                    });
-                }
-            })
+        for (const property in productInput) {
+            formData.append(property, productInput[property]);
+        }
+        formData.append('image', imageReview.file); 
+        await productApi.store(formData)
+        .then(res =>{
+            console.log(res);
+            if(res.success === true )
+            {
+                Transfers(res.id);
+            }
+        }).catch((error)=>{
+            if(error.response.data.error){
+                Notiflix.Report.failure(error.response.data.message,error.response.data.error , 'Cancel');
+            }
+            if(error.response.data.listError){ 
+                setProductInput((prev)=>{
+                    return {...prev,error_list: error.response.data.listError}
+                });
+            }
+        }); 
     }
-    const deleteProduct = (id)=>{
-        axios.delete('/product/delete',{data: {id}}).then((res)=>{
-            return true;
+    const deleteProduct =async (id)=>{
+        const params = {id}
+        await productApi.delete(params)
+        .then((res)=>{
+            if(res.success === true){
+                return true;
+            } 
         }).catch((error)=>{
             return false;
         })
@@ -310,12 +305,12 @@ function AddProduct() {
                                     </div>
                                     {imageReview.src &&  <div className="form-group text-center" >
                                         <img src={imageReview.src} id='review-image' className=" img-thumbnail w-50" alt="..."/>
-                                        <p>  Image : <i className="name_image"></i></p>
+                                        <p>  Image : <i className="name_image">{imageReview.name}</i></p>
                                     </div>}
                                     <div className="form-group row">
                                         <div className="col-sm-6">
                                             <label htmlFor="SelectAnHien">Chose Contract Supplier</label>
-                                            <select name="supplier"  value={productInput.supplier} onChange={handleInput}  className="form-control input-sm  inputform">
+                                            <select name="wallet"  value={productInput.wallet} onChange={handleInput}  className="form-control input-sm  inputform">
                                                 <option value={0} className="optionform">---Chose Supplier---</option>
                                                 {contracts ? contracts.map((contract)=>{
                                                     return (

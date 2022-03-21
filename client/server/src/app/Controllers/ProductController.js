@@ -9,7 +9,7 @@ class ProductController {
     //[POST] /product/store
     async store(req, res){
         let listError = {};
-        const {name, keyword, desc,display,slug,category_id,price,qty,type,wallet} = req.body;
+        const {name, keyword, desc,display,slug,category_id,price,qty,type_display,wallet} = req.body;
         const productSave  = new productModle({ 
                 name,
                 keyword,
@@ -20,16 +20,14 @@ class ProductController {
                 price,
                 qty,
                 wallet,
-                type_display:type,
+                type_display,
                 image: req.file ? req.file.filename : ''
         });
         await productSave.save()
                 .then((result)=>{
-                    console.log(result); 
                     res.status(200).json({success:true,id:result._id,message:"Add Product Successfully "});
                 })
                 .catch((error)=>{
-                    console.log(error.errors);
                     const unlinkAsync = promisify(fs.unlink);
                     if(req.file)
                     {
@@ -48,6 +46,7 @@ class ProductController {
                     };
                     res.status(400).json({success:false,message:"Add Product Failure!",listError});
                 });
+                return false;
     }
      //[GET] /product/show
     async show(req,res){
@@ -96,8 +95,7 @@ class ProductController {
     }
     //[GET] /product/detail?id=...
     async detail(req,res){
-        let { id } = req.query
-        
+        let id  = req.query.id
         try {
             const product = await productModle.findOne({_id:id});
             if(product){
@@ -110,15 +108,15 @@ class ProductController {
     //[PUT] /product/update
     async update(req,res){
         let listError = {};
-        const {name, keyword, desc,display,slug,category_id,price,qty,type,old_image,id} = req.body;
+        const {name, keyword, desc,display,slug,category_id,type_display,id,image} = req.body;
         const unlinkAsync = promisify(fs.unlink);
         const opts = { runValidators: true };
-        let update = { $set:{ name,keyword,desc,display,slug,category_id,price,qty,type_display:type,image: req.file ? req.file.filename : old_image}};
+        let update = { $set:{ name,keyword,desc,display,slug,category_id,type_display:type_display,image: req.file ? req.file.filename : image}};
         await productModle.updateOne({_id:id},update,opts)
                             .then((result)=>{
                                 if(req.file) 
                                 {
-                                    unlinkAsync(`public\\uploads\\${old_image}`);
+                                    unlinkAsync(`public\\uploads\\${image}`);
                                 } 
                                 res.status(200).json({success:true,message:"Update Product Successfully "});
                             })
@@ -140,25 +138,24 @@ class ProductController {
                                 res.status(400).json({success:false,message:"Add Product Failure!",listError});
                             });
     }
-    //[DELETE] /product/delete
+    //[DELETE] /product/delete 
     async delete(req,res){
-      const  {id} = req.body; 
-      if(!id){
-        res.status(400).json({success:false,message:"Delete Product Failure , Infomation not found"});
-      }
-      try {
-        await productModle.findById( id )
-                        .then((resoult)=>{
-                            const unlinkAsync = promisify(fs.unlink);
-                            unlinkAsync(`public\\uploads\\${resoult.image}`);
-                        })
-        await  productModle.deleteOne({ _id: id })
-                .then((result)=>{
+        const  id = req.query.id; 
+        try {
+            await productModle.findByIdAndRemove(id)
+            .then((result)=>{
+                if(result){
+                    const unlinkAsync = promisify(fs.unlink);
+                    unlinkAsync(`public\\uploads\\${result.image}`);
                     res.status(200).json({success:true});
-                })
-      } catch (error) {
-        res.status(500).json({success:false,message:"Internal Server Error"})
-      }
+                }else{
+                    throw {message:"Delete Product Failure , Infomation not found"};
+                }
+               
+            });
+        } catch (error) {
+            res.status(500).json({success:false,message: error.message})
+        }
     }
 }
 

@@ -19,7 +19,7 @@ router.post('/store',authMiddleware,async (req,res, next)=>{
 router.get('/show',productController.show);
 router.get('/detail',authMiddleware,productController.detail);
 router.put('/update',authMiddleware,async (req,res, next)=>{
-    Uploadfile('image')(req, res, function (err) {
+    Uploadfile('new_image')(req, res, function (err) {
         if (err) {
             let listError = {};
             listError ={

@@ -3,56 +3,42 @@ import {Link} from "react-router-dom";
 import $ from 'jquery'
 import axios  from "axios";
 import Notiflix from 'notiflix';
+import productApi from '../../../../Api/productApi';
+import categoryApi from '../../../../Api/categoryApi';
 function ListProduct() {
     const [products,setProducts] = useState([]);
-    const [categories,setCategory] = useState({});
-    const getProduct = new Promise((resolve,reject)=>{
-        axios.get('/product/show',{ 
-            params : { 
-              whoCall: 'admin',
-            } 
-            }).then((res)=>{
-            if(res.data.success === true){
-                resolve(res.data.products)
+    // const [categories,setCategorys] = useState({});
+    useEffect(() => {
+        const fetchProductlist = async () => {
+            try {
+                const params = {whoCall: 'admin' }
+                await productApi.getAll(params)
+                .then((res)=>{
+                    if(res.success === true){
+                        setProducts(res.products)
+                    }
+                })
+                .catch((err)=>{
+                    console.log(err)
+                })
+               
+            } catch (error) {
+                console.log(error)
             }
-        })
-        .catch((error)=>{
-            reject(error)
-            Notiflix.Report.failure("Product not Found","please come back later" , 'Cancel');
-        })
-    })
-    const getCategory = new Promise((resolve,reject)=>{
-        axios.get('/category/show',{ 
-            params : { 
-              whoCall: 'admin',
-            } 
-            }).then((res)=>{
-            if(res.data.success === true){
-                resolve(res.data.category)
-            }
-        })
-        .catch((error)=>{
-            reject(error)
-            Notiflix.Report.failure("Category not Found","Please come back later" , 'Cancel');
-        })
-    });
-
-    useEffect(()=>{
-        Promise.all([getProduct,getCategory]).then((values) => {
-            setCategory(values[1]);
-            setProducts(values[0]);
-          });
-    },[])
-
-    const handleRemoveProduct = (id)=>{
-        axios.delete('/product/delete',{data: {id}}).then((res)=>{
-            if(res.data.success === true){
+        }
+       fetchProductlist();
+    }, []);
+    const handleRemoveProduct = async (id) => {
+        const params = {id}
+        await productApi.delete(params)
+        .then((res)=>{
+            if(res.success === true){
                 Notiflix.Report.warning("Delete Product Successfully","Product has been remove from database" , 'Cancel');
-                $('#'+id).remove()
+                $('#'+id).remove();
             } 
+            console.log(res);
         }).catch((error)=>{
-                
-                Notiflix.Report.failure("Delete Product Failure",error.data.message, 'Cancel');
+            Notiflix.Report.failure("Delete Product Failure",error.response.data.message, 'Cancel');
         })
     }
     return (
