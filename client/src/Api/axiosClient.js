@@ -44,8 +44,10 @@ const axiosClient = axios.create({
 
 axiosClient.interceptors.request.use(async (config) => {
     const token = localStorage.getItem('auth_token');
+    const refeshtoken = localStorage.getItem('auth_token_refesh')
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+        config.headers.refeshAuthorization = `Bearer ${refeshtoken}`;
     }
 
   return config;

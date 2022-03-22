@@ -1,7 +1,8 @@
 import React,{ useState,useEffect} from "react";
 import { Link, useNavigate} from "react-router-dom";
-import axios  from "axios";
+// import axios  from "axios";
 import Notiflix from 'notiflix';
+import authorizationApi from "../../../Api/authApi";
 const Register = () =>{
     let navigate = useNavigate();
     useEffect(() => {
@@ -19,7 +20,7 @@ const Register = () =>{
     const handleInput = (e)=>{
         setRegisterInput({...registerInput,[e.target.name]: e.target.value})
     }
-    const handelSubmit =(e)=>{
+    const handelSubmit =async  (e)=>{
         e.preventDefault();
         let data ={
             email:registerInput.email,
@@ -27,17 +28,32 @@ const Register = () =>{
             name:registerInput.name,
             phone:registerInput.phone
         };
-        axios.post('/admin/register',data).then(res =>{
-            if(res.data.success == true ){
-                localStorage.setItem('auth_name',res.data.info.name);
-                localStorage.setItem('auth_token',res.data.accessToken);
-                setRegisterInput({...registerInput,error_list:[]});
-                Notiflix.Report.success(res.data.message, `"Welcome to Ecommerce Blockchain ."<br/><br/>-${res.data.info.name}`, 'Cancel');
+        await authorizationApi.register(data)
+        // axios.post('/admin/register',data)
+        .then(res =>{
+            if(res.success === true ){
+                localStorage.setItem('auth_name',res.info.name);
+                localStorage.setItem('auth_token',res.accessToken);
+                localStorage.setItem('auth_token_refesh',res.refeshToken);
+                Notiflix.Notify.success('Register Successfully');
                 navigate('/admin/dashboard');
+                setTimeout(() => {
+                    Notiflix.Confirm.show('Login session expired','Do you want to login again?','Yes','No',
+                        () => {
+                            handleLoginAgain(res.info.id);
+                        },
+                        () => {
+                            localStorage.removeItem('auth_token');
+                            localStorage.removeItem('auth_name');
+                            localStorage.removeItem('auth_avatar');
+                            localStorage.removeItem('auth_token_refesh');
+                            navigate('/admin/login');
+                        },
+                    );
+                }, 10800000);
             }
         })
         .catch((error)=>{
-            console.log(error.response)
             if(error.response.data.listError){
                 setRegisterInput((prev)=>{
                     return {...prev,error_list: error.response.data.listError}
@@ -45,6 +61,32 @@ const Register = () =>{
             }
         });
     }
+    const handleLoginAgain = (id)=>{
+        const params = {id}
+        authorizationApi.resetLogin(params)
+        .then((data)=> {
+            if(data.success == true){
+                localStorage.setItem('auth_name',data.info.name);
+                localStorage.setItem('auth_token',data.accessToken);
+                localStorage.setItem('auth_token_refesh',data.refeshToken);
+                Notiflix.Notify.success('Login Successfully');
+                setTimeout(() => {
+                    Notiflix.Confirm.show('Login session expired','Do you want to login again?','Yes','No',
+                        () => {
+                            handleLoginAgain(data.info.id);
+                        },
+                        () => {
+                            localStorage.removeItem('auth_token');
+                            localStorage.removeItem('auth_name');
+                            localStorage.removeItem('auth_avatar');
+                            localStorage.removeItem('auth_token_refesh');
+                            navigate('/admin/login');
+                        },
+                    );
+                }, 10800000);
+            }
+        });
+    }  
     return (    
         <div className="container">
             <div className="card o-hidden border-0 shadow-lg my-5">

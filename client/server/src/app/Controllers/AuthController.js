@@ -1,4 +1,5 @@
 const User = require('../Models/Users')
+const Token = require('../Models/Token')
 const argon2 = require('argon2');
 var jwt = require('jsonwebtoken');
 const sendMailOgani = require('../Middleware/SendMail');
@@ -28,9 +29,10 @@ class AuthController {
             });
              await  registerAdmin.save()
                                 .then((message)=>{
-                                    const {email,name,phone} = message;
+                                    const {_id,email,name,phone} = message;
                                     const accessToken = jwt.sign({userId: registerAdmin._id}, process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '3h'});
-                                    res.status(200).json({success:true,message:"Register Successfully ",accessToken,info:{name,email,phone}});
+                                    const refeshToken = jwt.sign({userId: registerAdmin._id},process.env.REFESH_TOKEN_SECRET);
+                                    res.status(200).json({success:true,message:"Register Successfully ",accessToken,refeshToken,info:{id:_id,name,email,phone}});
                                 })
                                 .catch((error)=>{
                                     listError = {
@@ -60,30 +62,62 @@ class AuthController {
             }
     
             const accessToken = jwt.sign({userId: user._id},process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '3h'});
-    
-            res.json({
-                success:true,
-                message:"Login Successfully ",
-                accessToken,
-                info:{
-                    name :user.name,
-                    email,
-                    phone: user.phone
-                }
-            });
+            const refeshToken = jwt.sign({userId: user._id},process.env.REFESH_TOKEN_SECRET);
+            const token = new Token({refeshToken: refeshToken});
+            await token.save()
+            .then((data)=>{
+                res.json({
+                    success:true,
+                    message:"Login Successfully ",
+                    accessToken,
+                    refeshToken,
+                    info:{
+                        id:user._id,
+                        name :user.name,
+                        email,
+                        phone: user.phone,
+                    }
+                });
+            })
+           
         } catch (error) {
             res.status(500).json({success:false,message:"Internal Server Error"})
         }
+    }
+     //[POST]  
+    //path /admin/reset-login
+    async resetLogin(req,res){
+        const {id} = req.body
+        const user = await User.findOne({id})
+        if(!user){
+            return res.status(400).json({success:false, message:"User not found!"})
+        }
+        const accessToken = jwt.sign({userId:id},process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '3h'});
+        const refeshToken = jwt.sign({userId:id},process.env.REFESH_TOKEN_SECRET);
+        res.json({
+            success:true,
+            message:"Login Successfully ",
+            accessToken,
+            refeshToken,
+            info:{
+                id:user._id,
+                name :user.name,
+                email:user.email,
+                phone: user.phone,
+            }
+        });
     }
     //[POST]  
     //path /admin/loginGoogle
     async loginGoogle(req,res){
         const {id} = req.body;
-        const accessToken = jwt.sign({userId: id},process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '3h'});
-            res.json({
+        const accessToken = jwt.sign({userId:id},process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '3h'});
+        const refeshToken = jwt.sign({userId:id},process.env.REFESH_TOKEN_SECRET);
+        res.json({
                 success:true,
                 message:"Login Successfully ",
-                accessToken
+                accessToken,
+                refeshToken
         });
     }
     //[POST]  

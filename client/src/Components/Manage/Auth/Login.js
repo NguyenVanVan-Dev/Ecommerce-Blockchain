@@ -3,6 +3,7 @@ import { Link, useNavigate} from "react-router-dom";
 import axios  from "axios";
 import Notiflix from 'notiflix';
 import { GoogleLogin} from 'react-google-login';
+import authorizationApi from "../../../Api/authApi";
 const Login = () =>{
     let navigate = useNavigate();
     useEffect(() => {
@@ -16,37 +17,101 @@ const Login = () =>{
     const handleInput = (e)=> {
         setLoginInput({...loginInput,[e.target.name]: e.target.value});
     }
-    const handleSubmit = (e) =>{
+    const handleSubmit =async  (e) =>{
         e.preventDefault();
         let data = {
             email:loginInput.email,
             password:loginInput.password,
         };
-        axios.post('/admin/login',data).then(res =>{
-            if(res.data.success === true ){
-                localStorage.setItem('auth_name',res.data.info.name);
-                localStorage.setItem('auth_token',res.data.accessToken);
-                setLoginInput({...loginInput,error_list:[]});
-                Notiflix.Report.success('Login Successfully', `"Welcome to Ecommerce-BlockChain."<br/><br/>-${res.data.info.name}`, 'Cancel');
+        // axios.post('/admin/login',data)
+        await authorizationApi.login(data)
+        .then(res =>{
+            if(res.success === true ){
+                localStorage.setItem('auth_name',res.info.name);
+                localStorage.setItem('auth_token',res.accessToken);
+                localStorage.setItem('auth_token_refesh',res.refeshToken);
+                Notiflix.Notify.success('Login Successfully');
                 navigate('/admin/dashboard');
+                setTimeout(() => {
+                    
+                    Notiflix.Confirm.show('Login session expired','Do you want to login again?','Yes','No',
+                        () => {
+                            handleLoginAgain(res.info.id);
+                        },
+                        () => {
+                            localStorage.removeItem('auth_token');
+                            localStorage.removeItem('auth_name');
+                            localStorage.removeItem('auth_avatar');
+                            localStorage.removeItem('auth_token_refesh');
+                            navigate('/admin/login');
+                        },
+                    );
+                }, 10800000);
             }
         }).catch((error)=>{
             Notiflix.Report.failure('Login Failure',error.response.data.message, 'Cancel');
         });
     };
+    const handleLoginAgain = (id)=>{
+        const params = {id}
+        authorizationApi.resetLogin(params)
+        .then((data)=> {
+            if(data.success == true){
+                localStorage.setItem('auth_name',data.info.name);
+                localStorage.setItem('auth_token',data.accessToken);
+                localStorage.setItem('auth_token_refesh',data.refeshToken);
+                Notiflix.Notify.success('Login Successfully');
+                setTimeout(() => {
+                    Notiflix.Confirm.show('Login session expired','Do you want to login again?','Yes','No',
+                        () => {
+                            handleLoginAgain(data.info.id);
+                        },
+                        () => {
+                            localStorage.removeItem('auth_token');
+                            localStorage.removeItem('auth_name');
+                            localStorage.removeItem('auth_avatar');
+                            localStorage.removeItem('auth_token_refesh');
+                            navigate('/admin/login');
+                        },
+                    );
+                }, 10800000);
+            }
+        });
+    }  
     // Login with Google 
     const clientId = "208882485320-g05b5oih0v1925793k36goam0havrn4h.apps.googleusercontent.com";
-    const onLoginSuccess = (res) => {  
+    const onLoginSuccess = async (res) => {  
         let data = {
             id:res.googleId
         }; 
-        axios.post('/admin/login/google',data).then(result =>{
-            if(result.data.success === true ){
+        await authorizationApi.loginGoogle(data)
+        // axios.post('/admin/login/google',data)
+        .then(result =>{
+            if(result.success === true ){
                 localStorage.setItem('auth_name',res.profileObj.name);
-                localStorage.setItem('auth_token',result.data.accessToken); 
+                localStorage.setItem('auth_token',result.accessToken); 
                 localStorage.setItem('auth_avatar',res.profileObj.imageUrl);
-                Notiflix.Report.success('Login Successfully', `"Welcome to Ecommerce-BlockChain."<br/><br/>-${res.profileObj.name}`, 'Cancel');
+                localStorage.setItem('auth_token_refesh',result.refeshToken);
+                Notiflix.Notify.success('Login Successfully');
                 navigate('/admin/dashboard');
+                setTimeout(() => {
+                    Notiflix.Confirm.show('Login session expired','Do you want to login again?','Yes','No',
+                        () => {
+                            localStorage.removeItem('auth_token');
+                            localStorage.removeItem('auth_name');
+                            localStorage.removeItem('auth_avatar');
+                            localStorage.removeItem('auth_token_refesh');
+                            navigate('/admin/login');
+                        },
+                        () => {
+                            localStorage.removeItem('auth_token');
+                            localStorage.removeItem('auth_name');
+                            localStorage.removeItem('auth_avatar');
+                            localStorage.removeItem('auth_token_refesh');
+                            navigate('/admin/login');
+                        },
+                    );
+                }, 10800000);
             }
         }).catch((error)=>{
             Notiflix.Report.failure('Login Failure',error.response.data.message, 'Cancel');
