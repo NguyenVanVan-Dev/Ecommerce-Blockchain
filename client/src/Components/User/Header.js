@@ -62,7 +62,9 @@ const Header = ({cartItems}) =>{
                         <li>
                             <Link to="/cart">Shoping Cart</Link>
                         </li>
-                        <li><a href="./checkout.html">Check Out</a></li>
+                        <li>
+                            <Link to={`/checkout`}>Check Out</Link>
+                            </li>
                         <li><a href="./blog-details.html">Blog Details</a></li>
                         </ul>
                     </li>

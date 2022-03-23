@@ -21,6 +21,7 @@ import Home from "./Components/User/WebPage/Home";
 import ListTransaction from "./Components/Manage/Webpage/Transaction/ListTransaction";
 import AddContract from "./Components/Manage/Webpage/Contract/AddContract";
 import ListContract from "./Components/Manage/Webpage/Contract/ListContract";
+import CheckOut from "./Components/User/WebPage/CheckOut";
 axios.defaults.baseURL = 'http://localhost:2105/';
 axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
 axios.defaults.headers.post['Accept'] = 'application / json';
@@ -47,7 +48,6 @@ function App() {
                 const newCart = prev.map((item)=> 
                     item._id === product._id ? {...ProductExits,quantity:ProductExits.quantity +1} : item
                 )
-                console.log(JSON.stringify(newCart));
                 localStorage.setItem('cart',JSON.stringify(newCart));
                 return newCart;
             })
@@ -67,6 +67,7 @@ function App() {
             <Route path="/" element={<MasterLayoutUI cartItems={cartItems}/>} >
                 <Route path="/" element={<Home handleAddCart={handleAddCart}  />} />
                 <Route path="cart" element={<Cart setCartItems={setCartItems} cartItems={cartItems}/>} />
+                <Route path="checkout" element={<CheckOut setCartItems={setCartItems} cartItems={cartItems}/>} />
             </Route>
             <Route path="/admin/login" element = {<Login/>} />
             <Route path="/admin/register" element = {<Register/>} />

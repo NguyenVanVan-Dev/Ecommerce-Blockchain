@@ -101,6 +101,7 @@ function AddProduct() {
         }
         web3Api.web3 && getAccount()
     }, [web3Api.web3]);
+    //review Image
     useEffect(() => {
         return () => {
             imageReview.src && URL.revokeObjectURL(imageReview.src);

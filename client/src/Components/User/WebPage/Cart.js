@@ -127,7 +127,7 @@ const Cart = ({cartItems,setCartItems}) => {
                             <li>Subtotal Two<span>{(subTotal/priceETH).toFixed(5)} ETH </span></li>
                             <li>Total <span>{subTotal.toLocaleString('vi-VN', {style: 'currency',currency: 'VND'})} || {(subTotal/priceETH).toFixed(5)} ETH</span></li>
                             </ul>
-                            <a href="#" className="primary-btn">PROCEED TO CHECKOUT</a>
+                            <Link to={`/checkout`} className="primary-btn">PROCEED TO CHECKOUT</Link>
                         </div>
                         </div>
                     </div>

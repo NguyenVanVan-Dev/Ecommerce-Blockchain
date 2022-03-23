@@ -110,7 +110,11 @@ ol {
 /*---------------------
   Helper CSS
 -----------------------*/
-
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 .section-title {
 	margin-bottom: 50px;
 	text-align: center;
