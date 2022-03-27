@@ -22,6 +22,7 @@ import ListTransaction from "./Components/Manage/Webpage/Transaction/ListTransac
 import AddContract from "./Components/Manage/Webpage/Contract/AddContract";
 import ListContract from "./Components/Manage/Webpage/Contract/ListContract";
 import CheckOut from "./Components/User/WebPage/CheckOut";
+import DetailProductUser from "./Components/User/WebPage/DetailProduct";
 axios.defaults.baseURL = 'http://localhost:2105/';
 axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
 axios.defaults.headers.post['Accept'] = 'application / json';
@@ -40,20 +41,20 @@ function App() {
         const storageCart = JSON.parse(localStorage.getItem('cart'));
         return storageCart ?? [];
     });
-    const handleAddCart = (product) =>{
+    const handleAddCart = (product,quantity = 1) =>{
         const ProductExits = cartItems.find((item)=> item._id === product._id);
         if(ProductExits)
         {
             setCartItems(prev => {
                 const newCart = prev.map((item)=> 
-                    item._id === product._id ? {...ProductExits,quantity:ProductExits.quantity +1} : item
+                    item._id === product._id ? {...ProductExits,quantity:ProductExits.quantity + quantity} : item
                 )
                 localStorage.setItem('cart',JSON.stringify(newCart));
                 return newCart;
             })
         }else {
             setCartItems(prev => {
-                const newCart =  [...prev,{...product,quantity:1}]
+                const newCart =  [...prev,{...product,quantity: quantity}]
                 localStorage.setItem('cart',JSON.stringify(newCart));
                 return newCart;
             });
@@ -68,6 +69,7 @@ function App() {
                 <Route path="/" element={<Home handleAddCart={handleAddCart}  />} />
                 <Route path="cart" element={<Cart setCartItems={setCartItems} cartItems={cartItems}/>} />
                 <Route path="checkout" element={<CheckOut setCartItems={setCartItems} cartItems={cartItems}/>} />
+                <Route path="product/:id" element={<DetailProductUser handleAddCart={handleAddCart}/>} />
             </Route>
             <Route path="/admin/login" element = {<Login/>} />
             <Route path="/admin/register" element = {<Register/>} />

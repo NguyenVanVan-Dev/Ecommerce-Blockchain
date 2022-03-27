@@ -52,6 +52,8 @@ class ProductController {
     async show(req,res){
         let whoCall = req.query.whoCall;
         let type =req.query.type;
+        let category_id =req.query.category_id;
+        let product_id =req.query.product_id;
         let products = {} ;
         let listOne;
         let listTwo;
@@ -80,6 +82,9 @@ class ProductController {
                             listTwo
                         }
                         break;    
+                    case 'related-product':
+                        products = await productModle.find({type_display: 1 , display: 1, category_id:category_id, _id: { "$ne": product_id }}).sort({ createdAt: -1 }).limit(8);
+                        break; 
                     default:
                         products = await productModle.find({display: 1});
                         break;
@@ -102,7 +107,7 @@ class ProductController {
                 res.status(200).json({success:true,product});
             }
         } catch (error) {
-            res.status(400).json({success:false,message:"Category not Found"});
+            res.status(400).json({success:false,message:"Product not Found"});
         }
     }
     //[PUT] /product/update
