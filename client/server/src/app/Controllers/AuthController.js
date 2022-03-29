@@ -164,7 +164,82 @@ class AuthController {
             })
         })
     }
-  
+    //[POST]
+    //path /login
+    async loginUser(req,res){
+        const {email, password} = req.body;
+        try {
+            const user = await User.findOne({ email })
+            if(!user){
+                return res.status(400).json({success:false, message:"Incorret Email or Password!"})
+            }
+            const passwordVeryfi   = await argon2.verify(user.password,password);
+            if(!passwordVeryfi){
+                return res.status(400).json({success:false, message:"Incorret Email or Password!"})
+            }
+    
+            const accessToken = jwt.sign({userId: user._id},process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '3h'});
+            const refeshToken = jwt.sign({userId: user._id},process.env.REFESH_TOKEN_SECRET);
+            const token = new Token({refeshToken: refeshToken});
+            await token.save()
+            .then((data)=>{
+                res.json({
+                    success:true,
+                    message:"Login Successfully ",
+                    accessToken,
+                    refeshToken,
+                    info: user
+                });
+            })
+           
+        } catch (error) {
+            res.status(500).json({success:false,message:"Internal Server Error"})
+        }
+    }
+    //[POST]  
+    //path /register  
+    async registerUser(req,res){ 
+        const {name, password, email, phone, streetAddress, apartmentAddress, city, country} = req.body;
+        const user = await User.findOne({ email })
+        let listError = {};
+        try {
+            if(user){
+                listError ={
+                    email:"Email account already in use, please choose another account!"
+                }
+                return res.status(400).json({success:false, message:"Register Failure!",listError})
+            } 
+            const hashPassword  = await argon2.hash(password);
+            const registerUser  = new User({ 
+                name: name,
+                phone:phone,
+                email:email,
+                password:hashPassword,
+                streetAddress:streetAddress,
+                apartmentAddress:apartmentAddress,
+                city:city,
+                country:country,
+            });
+             await  registerUser.save()
+                                .then((message)=>{
+                                    const accessToken = jwt.sign({userId: registerUser._id}, process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '3h'});
+                                    const refeshToken = jwt.sign({userId: registerUser._id},process.env.REFESH_TOKEN_SECRET);
+                                    res.status(200).json({success:true,message:"Register Successfully ",accessToken,refeshToken,info:registerUser});
+                                })
+                                .catch((error)=>{
+                                    listError = {
+                                        name:  error.errors.name ? error.errors.name.message : '',
+                                        email: error.errors.email ? error.errors.email.message : '',
+                                        phone: error.errors.phone ? error.errors.phone.message : '',
+                                    };
+                                    res.status(403).json({success:false,message:"Register Failure!",listError});
+                                });
+        } catch (error) {
+            console.log(error.message)
+            res.status(500).json({success:false,message:"Internal Server Error"})
+        }
+    }
+    
 }
 
 

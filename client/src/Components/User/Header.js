@@ -1,8 +1,14 @@
-import React ,{useLayoutEffect,useState} from "react";
+import React ,{useEffect,useState} from "react";
 import logo from '../../Resource/UserInterface/img/logo.png';
-import { Link} from "react-router-dom";
+import { Link,NavLink} from "react-router-dom";
 const Header = ({cartItems}) =>{
-    const subTotal = cartItems.reduce((total,item)=>total+ item.price * item.quantity,0)
+    const subTotal = cartItems.reduce((total,item)=>total+ item.price * item.quantity,0);
+    const [active, setActive] = useState(false);
+    useEffect(() => {
+        return () => {
+            setActive(false);
+        };
+    }, []);
     return (
         <header className="header">
             <div className="header__top">
@@ -23,6 +29,7 @@ const Header = ({cartItems}) =>{
                         <a href="#"><i className="fa fa-twitter" /></a>
                         <a href="#"><i className="fa fa-linkedin" /></a>
                         <a href="#"><i className="fa fa-pinterest-p" /></a>
+                        <Link to="/admin/login"><i className="fas fa-dumpster"/></Link>
                     </div>
                     <div className="header__top__right__language">
                         <img src="img/language.png" alt="" />
@@ -34,7 +41,7 @@ const Header = ({cartItems}) =>{
                         </ul>
                     </div>
                     <div className="header__top__right__auth">
-                        <Link to="/admin/login"><i className="fa fa-user" /> Login</Link>
+                        <Link to="/login"><i className="fa fa-user" /> Login</Link>
                         
                     </div>
                     </div>
@@ -52,19 +59,22 @@ const Header = ({cartItems}) =>{
                 <div className="col-lg-6">
                 <nav className="header__menu">
                     <ul>
-                    <li className="active">
-                        <Link to="/">Home</Link>
+                    <li >
+                        <NavLink to="/" className={(navData) => (navData.isActive ? 'active' : 'link')} >Home</NavLink>
+                        {/* <Link to="/">Home</Link> */}
                     </li>
                     <li><a href="./shop-grid.html">Shop</a></li>
-                    <li><a href="#">Pages</a>
+                    <li className={active ? "active" : "link"}><a href="#">Pages</a>
                         <ul className="header__menu__dropdown">
                         <li><a href="./shop-details.html">Shop Details</a></li>
                         <li>
-                            <Link to="/cart">Shoping Cart</Link>
+                            <NavLink to="/cart" className={(navData) => (navData.isActive ? setActive(true) : 'link')}>Shoping Cart</NavLink>
+                            {/* <Link to="/cart">Shoping Cart</Link> */}
                         </li>
                         <li>
-                            <Link to={`/checkout`}>Check Out</Link>
-                            </li>
+                            {/* <Link to={`/checkout`}>Check Out</Link> */}
+                            <NavLink to={`/checkout`} className={(navData) => (navData.isActive ? setActive(true) : 'link')}>Check Out</NavLink>
+                        </li>
                         <li><a href="./blog-details.html">Blog Details</a></li>
                         </ul>
                     </li>
@@ -91,4 +101,4 @@ const Header = ({cartItems}) =>{
     )
 }
 
-export default Header;
+export default React.memo(Header);

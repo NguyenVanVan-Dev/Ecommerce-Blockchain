@@ -3,7 +3,6 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     name: { 
         type: String, 
-        default: 'Vấn Vip Pro',
         required:[true , 'Please enter your name!' ]
     }, 
     phone:{ 
@@ -21,6 +20,34 @@ const userSchema = new Schema({
         type:String,
         min:[8, 'Please enter a password longer than 8 characters!'],
         required:[true , 'Please enter your password!' ]
+    },
+    streetAddress:{
+        type: String,
+        max:255,
+        default:''
+    },
+    apartmentAddress:{
+        type: String,
+        max:255,
+        default:''
+    },
+    city:{
+        type: String,
+        max:255,
+        default:''
+    },
+    country:{
+        type: String,
+        max:255,
+        default:''
+    },
+    isAdmin:{
+        type: Number,
+        default:0,
+        enum: {
+            values: [0, 1],
+            message: '{VALUE} is not supported'
+        }
     },
     resetLink:{
         type:String,

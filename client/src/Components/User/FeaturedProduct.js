@@ -85,7 +85,7 @@ const FeaturedProduct = ({handleAddCart}) => {
                                         </div>
                                         <Link to={`product/${product._id}`}>
                                         <div className="featured__item__text">
-                                            <h6><a href="#">{product.name}</a></h6>
+                                            <h6>{product.name}</h6>
                                             <h5>{price.toLocaleString('vi-VN', {style: 'currency',currency: 'VND'})}</h5>
                                         </div>
                                         </Link>

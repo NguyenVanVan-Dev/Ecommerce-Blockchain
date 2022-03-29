@@ -26,6 +26,14 @@ const authorizationApi = {
     const url = '/admin/reset-password';
     return axiosClient.put(url,params);
   },
+  loginUser: (params) => {
+    const url = `/user/login`;
+    return axiosClient.post(url,params);
+  },
+  registerUser:(params) => {
+    const url = `/user/register`;
+    return axiosClient.post(url,params);
+  },
 }
 
 export default authorizationApi;

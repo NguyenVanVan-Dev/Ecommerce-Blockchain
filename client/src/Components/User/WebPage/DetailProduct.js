@@ -77,7 +77,7 @@ function DetailProduct({handleAddCart,setCartItems}) {
                             { relatedProduct &&  
                             relatedProduct.map((product) => {
                                 return (
-                                    <img data-imgbigurl={`/uploads/${product.image}`} src={`/uploads/${product.image}`} style={{height: "140px"}} alt="naice" />
+                                    <img key={product._id} data-imgbigurl={`/uploads/${product.image}`} src={`/uploads/${product.image}`} style={{height: "140px"}} alt="naice" />
                                 )
                             })
                             }
@@ -214,13 +214,17 @@ function DetailProduct({handleAddCart,setCartItems}) {
                                         <ul className="product__item__pic__hover">
                                         <li><a href="#"><i className="fa fa-heart" /></a></li>
                                         <li><a href="#"><i className="fa fa-retweet" /></a></li>
-                                        <li><a href="#"><i className="fa fa-shopping-cart" /></a></li>
+                                        <li onClick={()=>{handleAddCart(product)}}>
+                                            <Link to=" "><i className="fa fa-shopping-cart" /></Link>
+                                        </li>
                                         </ul>
                                     </div>
-                                    <div className="product__item__text">
-                                        <h6><a href="#">{product.name}</a></h6>
-                                        <h5>{(product.price)}</h5>
-                                    </div>
+                                    <Link to={`/product/${product._id}`}>
+                                        <div className="featured__item__text">
+                                            <h6>{product.name}</h6>
+                                            <h5>{(product.price).toLocaleString('vi-VN', {style: 'currency',currency: 'VND'})}</h5>
+                                        </div>
+                                    </Link>
                                     </div>
                                 </div>
                             )

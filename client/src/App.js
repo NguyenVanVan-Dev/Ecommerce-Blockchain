@@ -23,6 +23,7 @@ import AddContract from "./Components/Manage/Webpage/Contract/AddContract";
 import ListContract from "./Components/Manage/Webpage/Contract/ListContract";
 import CheckOut from "./Components/User/WebPage/CheckOut";
 import DetailProductUser from "./Components/User/WebPage/DetailProduct";
+import LoginUser from "./Components/User/WebPage/Login";
 axios.defaults.baseURL = 'http://localhost:2105/';
 axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
 axios.defaults.headers.post['Accept'] = 'application / json';
@@ -66,10 +67,11 @@ function App() {
         <div className="App">
         <Routes>
             <Route path="/" element={<MasterLayoutUI cartItems={cartItems}/>} >
-                <Route path="/" element={<Home handleAddCart={handleAddCart}  />} />
                 <Route path="cart" element={<Cart setCartItems={setCartItems} cartItems={cartItems}/>} />
                 <Route path="checkout" element={<CheckOut setCartItems={setCartItems} cartItems={cartItems}/>} />
                 <Route path="product/:id" element={<DetailProductUser handleAddCart={handleAddCart}/>} />
+                <Route path="login" element={<LoginUser/>} />
+                <Route path="/" element={<Home handleAddCart={handleAddCart}  />} />
             </Route>
             <Route path="/admin/login" element = {<Login/>} />
             <Route path="/admin/register" element = {<Register/>} />

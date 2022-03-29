@@ -2,6 +2,7 @@ import React,{ useEffect,useLayoutEffect,useState} from "react";
 import OwlCarousel from 'react-owl-carousel';
 import axios from "axios";
 import Notiflix from 'notiflix';
+import { Link } from "react-router-dom";
 
 const LastestSlideProduct = () => {
     const [latestProducts,setLatestProducts] = useState();
@@ -50,7 +51,7 @@ const LastestSlideProduct = () => {
                                             {
                                                 latestProducts.listOne.map((product)=>{
                                                     let price = product.price;
-                                                    return ( <a key={product._id} href="#" className="latest-product__item">
+                                                    return ( <Link key={product._id} to={`product/${product._id}`} className="latest-product__item">
                                                                 <div className="latest-product__item__pic">
                                                                     <img src={`uploads/${product.image}`} alt="" />
                                                                 </div>
@@ -58,7 +59,7 @@ const LastestSlideProduct = () => {
                                                                     <h6>{product.name}</h6>
                                                                     <span>{price.toLocaleString('vi-VN', {style: 'currency',currency: 'VND'})}</span>
                                                                 </div>
-                                                            </a>)
+                                                            </Link>)
                                                 })
                                             }
                                         </div>
@@ -66,7 +67,7 @@ const LastestSlideProduct = () => {
                                         {
                                             latestProducts.listTwo.map((product)=>{
                                                 let price = product.price;
-                                                return ( <a key={product._id} href="#" className="latest-product__item">
+                                                return ( <Link key={product._id} to={`product/${product._id}`} className="latest-product__item">
                                                             <div className="latest-product__item__pic">
                                                                 <img src={`uploads/${product.image}`} alt="" />
                                                             </div>
@@ -74,7 +75,7 @@ const LastestSlideProduct = () => {
                                                                 <h6>{product.name}</h6>
                                                                 <span>{price.toLocaleString('vi-VN', {style: 'currency',currency: 'VND'})}</span>
                                                             </div>
-                                                        </a>)
+                                                        </Link>)
                                             })
                                         }
                                         </div>
@@ -99,7 +100,7 @@ const LastestSlideProduct = () => {
                                         {
                                             topRateProducts.listOne.map((product)=>{
                                                 let price = product.price;
-                                                return ( <a key={product._id} href="#" className="latest-product__item">
+                                                return ( <Link key={product._id} to={`product/${product._id}`} className="latest-product__item">
                                                             <div className="latest-product__item__pic">
                                                                 <img src={`uploads/${product.image}`} alt="" />
                                                             </div>
@@ -107,7 +108,7 @@ const LastestSlideProduct = () => {
                                                                 <h6>{product.name}</h6>
                                                                 <span>{price.toLocaleString('vi-VN', {style: 'currency',currency: 'VND'})}</span>
                                                             </div>
-                                                        </a>)
+                                                        </Link>)
                                             })
                                         }
                                         </div>
@@ -115,7 +116,7 @@ const LastestSlideProduct = () => {
                                         {
                                             topRateProducts.listTwo.map((product)=>{
                                                 let price = product.price;
-                                                return ( <a key={product._id} href="#" className="latest-product__item">
+                                                return ( <a key={product._id} to={`product/${product._id}`} className="latest-product__item">
                                                             <div className="latest-product__item__pic">
                                                                 <img src={`uploads/${product.image}`} alt="" />
                                                             </div>

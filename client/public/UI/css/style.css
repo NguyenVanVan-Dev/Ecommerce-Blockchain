@@ -143,7 +143,11 @@ input::-webkit-inner-spin-button {
 	background-size: cover;
 	background-position: top center;
 }
-
+.bg-login-user{
+    background-position: center;
+    object-fit: cover;
+	background: url("../../uploads/bg-login-user2.jpg") no-repeat;
+}
 .spad {
 	padding-top: 100px;
 	padding-bottom: 100px;
@@ -466,7 +470,9 @@ input::-webkit-inner-spin-button {
 .header__menu ul li.active a {
 	color: #7fad39;
 }
-
+.header__menu ul li a.active {
+	color: #7fad39;
+}
 .header__menu ul li:hover .header__menu__dropdown {
 	top: 30px;
 	opacity: 1;
@@ -862,6 +868,7 @@ input::-webkit-inner-spin-button {
 }
 
 .featured__item__pic {
+	background-color: #F5F5F5;
 	height: 270px;
 	position: relative;
 	overflow: hidden;
@@ -1542,6 +1549,7 @@ input::-webkit-inner-spin-button {
 	height: 270px;
 	position: relative;
 	overflow: hidden;
+	background-color: #F5F5F5;
 }
 
 .product__item__pic__hover {
@@ -1669,6 +1677,7 @@ input::-webkit-inner-spin-button {
 
 .product__details__pic__item {
 	margin-bottom: 20px;
+	background-color: #F5F5F5;
 }
 
 .product__details__pic__item img {
