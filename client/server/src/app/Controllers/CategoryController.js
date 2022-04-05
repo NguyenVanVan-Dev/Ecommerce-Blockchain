@@ -44,6 +44,7 @@ class CategoryController {
     }
      //[GET] /category/show
     async show(req,res){
+        // console.log(this.detail(req,res));
         let whoCall = req.query.whoCall;
         let type = req.query.type;
         let category ;

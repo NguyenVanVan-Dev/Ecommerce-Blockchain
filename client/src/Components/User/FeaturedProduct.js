@@ -1,7 +1,6 @@
 import React,{useEffect,useState} from 'react'
 import axios from 'axios';
 import Notiflix from 'notiflix';
-import $ from 'jquery';
 import mixitup from 'mixitup';
 import { Link } from "react-router-dom";
 const FeaturedProduct = ({handleAddCart}) => {
@@ -12,13 +11,15 @@ const FeaturedProduct = ({handleAddCart}) => {
             .then((res)=>{
                 if(res.data.success === true){
                     setCategory(res.data.category)
-                    /*------------------
-                        Gallery filter
-                    --------------------*/
-                    $('.featured__controls li').on('click', function () {
-                        $('.featured__controls li').removeClass('active');
-                        $(this).addClass('active');
-                    });
+                    let featured__controls = document.querySelectorAll('.featured__controls li')
+                    featured__controls.forEach((item,index,array) => {
+                        item.addEventListener('click', () => {
+                            array.forEach((item)=> {
+                                item.classList.remove('active');
+                            })
+                            item.classList.add('active');
+                        })
+                    })
                 }
             })
             .catch((error)=>{
@@ -31,15 +32,15 @@ const FeaturedProduct = ({handleAddCart}) => {
             .then((res)=>{
                 if(res.data.success === true){
                     setProduct(res.data.products);
-                    
-                    if ($('.featured__filter').length > 0) {
-                        var containerEl = document.querySelector('.featured__filter');
-                        var mixer = mixitup(containerEl);
+                    let featured__filter = document.querySelector('.featured__filter');
+                    if(featured__filter){
+                        var mixer = mixitup(featured__filter);
                     }
-                    $('.set-bg').each(function () {
-                        var bg = $(this).data('setbg');
-                        $(this).css('background-image', 'url(' + bg + ')');
-                    });
+                    const setBg = document.querySelectorAll('.set-bg');
+                    setBg.forEach((item) => {
+                        let bg = item.getAttribute('data-setbg');
+                        item.style.backgroundImage = `url('${bg}')`;
+                    })
                 }
             })
             .catch((error)=>{

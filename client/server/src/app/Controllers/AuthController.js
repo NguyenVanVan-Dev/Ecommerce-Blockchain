@@ -181,6 +181,7 @@ class AuthController {
             const accessToken = jwt.sign({userId: user._id},process.env.ACCESS_TOKEN_SECRET,{ expiresIn: '3h'});
             const refeshToken = jwt.sign({userId: user._id},process.env.REFESH_TOKEN_SECRET);
             const token = new Token({refeshToken: refeshToken});
+            const {name, phone, streetAddress, apartmentAddress, city, country} = user;
             await token.save()
             .then((data)=>{
                 res.json({
@@ -188,11 +189,12 @@ class AuthController {
                     message:"Login Successfully ",
                     accessToken,
                     refeshToken,
-                    info: user
+                    info: {name, email, phone, streetAddress, apartmentAddress, city, country}
                 });
             })
            
         } catch (error) {
+            console.log(error)
             res.status(500).json({success:false,message:"Internal Server Error"})
         }
     }

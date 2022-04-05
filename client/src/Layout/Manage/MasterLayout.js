@@ -4,7 +4,7 @@ import Sidebar from "../../Components/Manage/Dashboard/Sidebar";
 import Topbar from "../../Components/Manage/Dashboard/Topbar";
 import Footer from "../../Components/Manage/Dashboard/Footer";
 import ModalLogout from "../../Components/Manage/Dashboard/ModalLogout";
-
+import { Web3Provider} from "../../Providers";
 const MasterLayout = () =>{
     let navigate = useNavigate();
     useEffect(() => {
@@ -12,17 +12,19 @@ const MasterLayout = () =>{
         return; 
     }, []);
     return (
-        <div id="wrapper">
-            <Sidebar/>
-            <div id="content-wrapper" className="d-flex flex-column">
-                <div id="content">
-                    <Topbar/>
-                    <Outlet />
+       <Web3Provider>
+            <div id="wrapper">
+                <Sidebar/>
+                <div id="content-wrapper" className="d-flex flex-column">
+                    <div id="content">
+                        <Topbar/>
+                        <Outlet />
+                    </div>
+                    <Footer></Footer>
                 </div>
-                <Footer></Footer>
+                <ModalLogout></ModalLogout>
             </div>
-            <ModalLogout></ModalLogout>
-        </div>
+       </Web3Provider>
     )
 }
 

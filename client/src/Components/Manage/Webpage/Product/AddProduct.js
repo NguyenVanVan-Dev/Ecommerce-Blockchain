@@ -3,12 +3,10 @@ import {Link} from "react-router-dom";
 import axios  from "axios";
 import Notiflix from 'notiflix';
 import $ from 'jquery'
-import Web3 from 'web3';
-import detectEthereumProvider from '@metamask/detect-provider';
-import {loadContract} from '../../../../utilis/load-contracts';
 import productApi from '../../../../Api/productApi';
-
+import { useWeb3 } from "../../../../Providers";
 function AddProduct() {
+    const {web3,contract,provider} = useWeb3();
     const [priceETH, setPriceETH] = useState("");
     const [priceTotalVND, setTotalVND] = useState();
     const [priceTotalETH, setTotalETH] = useState();
@@ -28,12 +26,8 @@ function AddProduct() {
         error_list:{},
     })
     const [imageReview,setImageReview] = useState({src: '',file:'',name:''});
-    const [web3Api, setWeb3Api] = useState({
-        provider: null,
-        web3: null,
-        contract: null,
-    });
     const [account, setAccount] = useState(null);
+    const [isConnected, setIsConnected] = useState(false);
     // Show Price ETH
     useEffect(() => {
         fetch("https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=ETH,VND")
@@ -74,44 +68,33 @@ function AddProduct() {
         setTotalVND(productInput.price * productInput.qty);
         setTotalETH(productInput.price * productInput.qty / parseFloat(priceETH));
     }, [productInput.price,productInput.qty]);
-   
-    // Load Provider 
+    // Get Wallet  
     useEffect(() => {
-        const loadProvider = async () => {
-          const provider = await detectEthereumProvider();
-          const contract = await loadContract("ManagerOgani", provider)
-          if (provider) {
-            setAccountLister(provider)
-            setWeb3Api({
-              web3: new Web3(provider),
-              provider,
-              contract
-            })
-          } else {
-            console.error("please, Install Metamask")
-          }
+        const handleAccountsChanged = async () => {
+            const accounts = await web3.eth.getAccounts();
+            if(accounts.length === 0)
+            {
+                console.log("No Wallet");
+            }else if(accounts[0] !== account) {
+                setAccount(accounts[0]);
+            }
         }
-        loadProvider()
-      }, []);
-    //Get Account
-    useEffect(() => {
-        const getAccount = async () => {
-            const accounts = await web3Api.web3.eth.getAccounts()
-            setAccount(accounts[0])
+        if(isConnected) {
+            provider.on("accountsChanged",handleAccountsChanged);
         }
-        web3Api.web3 && getAccount()
-    }, [web3Api.web3]);
+        return () => {
+            if(isConnected) {
+                provider.removeListener('accountsChanged', handleAccountsChanged);
+            }
+        }
+    }, [isConnected]);
     //review Image
     useEffect(() => {
         return () => {
             imageReview.src && URL.revokeObjectURL(imageReview.src);
         };
     }, [imageReview]);
-    const setAccountLister = (provider) => {
-        provider.on("accountChanged", accounts => setAccount(accounts[0]))
-    }
     const Transfers = async (id) =>{
-        const {contract, web3 } = web3Api
         const amount = web3.utils.toWei(priceTotalETH.toString(), "ether");
         let   addressSupplier = productInput.wallet;
         await contract.transferToSupplier(id,addressSupplier.toString(),{
@@ -158,7 +141,7 @@ function AddProduct() {
     const handelSubmit = (e)=>{
         e.preventDefault();
         if(!account){
-            web3Api.provider.request({ method:'eth_requestAccounts'})
+            provider.request({ method:'eth_requestAccounts'})
                             .then((result)=>{
                                 setAccount(result[0]);
                                 storeProduct();
@@ -207,6 +190,20 @@ function AddProduct() {
             return false;
         })
     }
+    const  handelConnectMetamask = async () => {
+        provider.request({ method: 'eth_requestAccounts' })
+        .then((account)=>{
+           setAccount(account[0]);
+           setIsConnected(true);
+        })
+        .catch((error) => {
+          if (error.code === 4001) {
+            console.log('Please connect to MetaMask.');
+          } else {
+            console.error(error);
+          }
+        });
+    }
     return (
         <div className="container">
             <div className="card o-hidden border-0 shadow-lg my-5">
@@ -220,7 +217,7 @@ function AddProduct() {
                                 </div>
                                 <div className="mb-4 d-flex justify-content-between">
                                     <Link to={'/admin/list-product'} className="btn btn-primary ">List Product</Link>
-                                    <button onClick={()=>web3Api.provider.request({ method:'eth_requestAccounts'})} className="btn btn-primary btn-user">
+                                    <button onClick={handelConnectMetamask} className="btn btn-primary btn-user">
                                         Connect Metamask
                                     </button>
                                 </div>

@@ -1,20 +1,25 @@
 import React,{useEffect,useState} from 'react';
 import { Link ,useNavigate} from 'react-router-dom';
-import $ from "jquery";
 import Notiflix from "notiflix";
 import authorizationApi from '../../../Api/authApi';
+import { useUser } from "../../../Providers";
 function Login() {
     const navigate = useNavigate();
+    const { setUser } = useUser();
+    useEffect(() => {
+        if ( localStorage.getItem('user')) return navigate('/');
+    },[]);
     const [inputloginUser, setInputLoginUser] = useState({
         email:'',
         password:'',
         error_list:[],
     });
     useEffect(() => {
-        $('.set-bg').each(function () {
-            var bg = $(this).data('setbg');
-            $(this).css('background-image', 'url(' + bg + ')');
-        });
+        const setBg = document.querySelectorAll('.set-bg');
+        for (const item of setBg) {
+            let bg = item.getAttribute('data-setbg');
+            item.style.backgroundImage = `url('${bg}')`;
+        }
     }, []);
 
     const handleInput = (e) =>{
@@ -32,11 +37,12 @@ function Login() {
             if(data.success === true ){
                 localStorage.setItem('user',JSON.stringify(data.info));
                 Notiflix.Notify.success('Login Successfully');
+                setUser(data.info);
                 navigate('/');
             }
         })
         .catch((err) => {
-            console.log(err.response);
+            Notiflix.Report.failure('Login Failed', err.response.data.message,'Cancel');
         })
     }
     

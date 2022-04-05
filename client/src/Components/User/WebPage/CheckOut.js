@@ -1,41 +1,30 @@
 import React,{useEffect,useState} from 'react'
 import { Link } from 'react-router-dom';
-import $ from 'jquery';
 import Notiflix from 'notiflix';
-import Web3 from 'web3';
-import detectEthereumProvider from '@metamask/detect-provider';
-import {loadContract} from '../../../utilis/load-contracts';
 import checkoutApi from '../../../Api/checkoutApi';
 import authorizationApi from '../../../Api/authApi';
+import {useWeb3} from '../../../Providers';
 function CheckOut({cartItems,setCartItems}) {
     const subTotal = cartItems.reduce((total,item)=>total+ item.price * item.quantity,0)
-    // const [priceTotalETH, setTotalETH] = useState(0);
+    const {web3, contract, provider} = useWeb3();
     const [priceETH, setPriceETH] = useState(1);
     const [createAccount, setCreateAccount] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState({
-        method: 1
-    });
+    const [paymentMethod, setPaymentMethod] = useState({method: 1});
     const [checkout, setCheckout] = useState({
-        firstName:'',
-        lastName:'',
-        streetAddress:'',
-        apartmentAddress:'',
-        city:'',
-        country:'',
-        sdt:'',
-        email:'',
+        firstName:'Vấn',
+        lastName:'Nguyễn Văn',
+        streetAddress:'144 Huỳnh Văn Nghệ',
+        apartmentAddress:'144 Huỳnh Văn Nghệ, Đà Nẵng',
+        city:'Đà Nẵng',
+        country:'Việt Nam',
+        sdt:'0362458584',
+        email:'van@gmail.com',
         password:'',
-        notes:'',
+        notes:'Giao hàng nhanh nhé!',
         total:subTotal,
         error_list:{},
     });
-    const [web3Api, setWeb3Api] = useState({
-        provider: null,
-        web3: null,
-        contract: null,
-    });
     const [account, setAccount] = useState(null);
-
     useEffect(() => {
         const getPriceEth = async ()=>{
             fetch("https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=ETH,VND")
@@ -47,42 +36,11 @@ function CheckOut({cartItems,setCartItems}) {
         getPriceEth();
     }, []);
     const priceTotalETH =(subTotal / parseFloat(priceETH)).toFixed(10);
-    // Load Provider 
-    useEffect(() => {
-    const loadProvider = async () => {
-        const provider = await detectEthereumProvider();
-        const contract = await loadContract("ManagerOgani", provider)
-        if (provider) {
-        // setAccountLister(provider)
-        setWeb3Api({
-            web3: new Web3(provider),
-            provider,
-            contract
-        })
-        } else {
-        console.error("please, Install Metamask")
-        }
-    }
-    loadProvider()
-    }, []);
-    //Get Account
-    useEffect(() => {
-        const getAccount = async () => {
-            const accounts = await web3Api.web3.eth.getAccounts()
-            setAccount(accounts[0])
-        }
-        web3Api.web3 && getAccount()
-    }, [web3Api.web3]);
     const handleInput = (e)=> {
         setCheckout({...checkout,[e.target.name]: e.target.value});
     }
     const cart = localStorage.getItem('cart');
-    const handleSDT = (e)=>{
-        if((e.target.value).length==10 && e.keyCode!=8) return false;
-    }
-
     const userPaymentOrder = async (id)=>{
-        const {contract, web3 } = web3Api
         const amount = web3.utils.toWei(priceTotalETH.toString(), "ether");
         await contract.userPaymentOrder(id,{
                 from:account,
@@ -111,7 +69,30 @@ function CheckOut({cartItems,setCartItems}) {
             })
         return false;
     }
-    const handleSubmit = (e) =>{
+    const handleAccountsChanged = async () => {
+        const accounts = await web3.eth.getAccounts();
+        if(accounts.length === 0)
+        {
+            console.log("No Wallet");
+        }else if(accounts[0] !== account) {
+            setAccount(accounts[0]);
+        }
+    }
+    const  handelConnectMetamask = async () => {
+        provider.request({ method: 'eth_requestAccounts' })
+        .then((account)=>{
+           setAccount(account[0]);
+        //    setIsConnected(true);
+        })
+        .catch((error) => {
+          if (error.code === 4001) {
+            Notiflix.Report.failure(`Can't payment`,'Please connect to MetaMask.','Canel');
+          } else {
+            console.error(error);
+          }
+        });
+    }
+    const handleSubmit = (e) => {
         e.preventDefault();
         const params = {
             firstName:checkout.firstName,
@@ -131,34 +112,57 @@ function CheckOut({cartItems,setCartItems}) {
         if(!cart){
             Notiflix.Report.failure(`Can't payment`,'Your shopping cart is empty','Canel');
         }else{
-            if(paymentMethod.method == 1)
-            {
-                storeOrder(params).then((res) =>{
-                    localStorage.removeItem('cart');
-                    setCartItems([]);
-                    setCheckout({
-                        firstName:'',
-                        lastName:'',
-                        streetAddress:'',
-                        apartmentAddress:'',
-                        city:'',
-                        country:'',
-                        sdt:'',
-                        email:'',
-                        password:'',
-                        notes:'',
-                        total:subTotal,
-                        error_list:{}
+
+            switch (paymentMethod.method) {
+                case 1:
+                    handleStoreOrder(params)
+                    .then((res) =>{
+                        localStorage.removeItem('cart');
+                        setCartItems([]);
+                        setCheckout({
+                            firstName:'',
+                            lastName:'',
+                            streetAddress:'',
+                            apartmentAddress:'',
+                            city:'',
+                            country:'',
+                            sdt:'',
+                            email:'',
+                            password:'',
+                            notes:'',
+                            total:subTotal,
+                            error_list:{}
+                        })
                     })
-                });
-            }else{
-                storeOrder(params).then((res)=>{
-                    userPaymentOrder(res);
-                    // console.log(res)
-                })
-               
+                    .catch((error) => {
+                        if(error.response.data.listError){
+                            setCheckout((prev)=>{
+                                return {...prev, error_list: error.response.data.listError}
+                            });
+                        }
+                    });
+                    break;
+                case 2:
+                    if(account === null) {
+                        handelConnectMetamask();
+                    } else {
+                        handleStoreOrder(params)
+                        .then((res)=>{
+                            userPaymentOrder(res);
+                        })
+                        .catch((error) => {
+                            if(error.response.data.listError){
+                                setCheckout((prev)=>{
+                                    return {...prev, error_list: error.response.data.listError}
+                                });
+                            }
+                        });
+                    }
+                    break;
+                default:
+                    throw new Error("Invalid payment method");
             }
-            if(createAccount){
+            if (createAccount) {
                 const paramsAcount = {
                     name:checkout.firstName +' '+checkout.lastName,
                     streetAddress:checkout.streetAddress,
@@ -179,7 +183,7 @@ function CheckOut({cartItems,setCartItems}) {
             }
         }
     }
-    const storeOrder = async (params) =>{
+    const handleStoreOrder = async (params) =>{
         let orderID;
         await checkoutApi.checkout(params)
         .then((data)=>{
@@ -189,12 +193,7 @@ function CheckOut({cartItems,setCartItems}) {
             }
         })
         .catch((err)=>{
-            console.log(err);
-            if(err.response.data.listError){
-                setCheckout((prev)=>{
-                    return {...prev,error_list: err.response.data.listError}
-                });
-            }
+            throw err;
         })
         return orderID;
     }
@@ -225,7 +224,7 @@ function CheckOut({cartItems,setCartItems}) {
                     </div>
                     <div className="checkout__form">
                         <h4>Billing Details</h4>
-                        <form action="#">
+                        <form action="#" autoComplete='on'>
                         <div className="row">
                             <div className="col-lg-8 col-md-6">
                                 <div className="row">
@@ -269,7 +268,7 @@ function CheckOut({cartItems,setCartItems}) {
                                 <div className="col-lg-6">
                                 <div className="checkout__input">
                                     <p>Phone<span>*</span></p>
-                                    <input type="number" name='sdt' value={checkout.sdt} onChange={handleInput} onKeyDown={handleSDT} />
+                                    <input type="number" name='sdt' value={checkout.sdt} onChange={handleInput} />
                                     <span className="text-danger small">{checkout.error_list.sdt}</span>
                                 </div>
                                 </div>
@@ -292,7 +291,7 @@ function CheckOut({cartItems,setCartItems}) {
                                 please login at the top of the page</p>
                             <div className="checkout__input">
                                 <p>Account Password<span>*</span></p>
-                                <input type="text" name='password' value={checkout.password} onChange={handleInput}/>
+                                <input type="password" name='password' value={checkout.password} onChange={handleInput}/>
                                 <span className="text-danger small">{checkout.error_list.password}</span>
                             </div>
                             <div className="checkout__input__checkbox">

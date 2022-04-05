@@ -4,9 +4,10 @@ import $ from 'jquery';
 import TopBar from "../../Components/User/Topbar"
 import Header from "../../Components/User/Header";
 import SideBarCategory from "../../Components/User/SideBarCategory";
-
 import Footer from "../../Components/User/Footer";
 import { Outlet } from "react-router-dom";
+import { Web3Provider } from "../../Providers";
+import { UserProvider } from "../../Providers";
 const MasterLayout = ({cartItems}) =>{
     
     useEffect(() => {
@@ -16,20 +17,22 @@ const MasterLayout = ({cartItems}) =>{
         });
     });
     return (
-       <>
-        <div>
-            <div id="preloder">
-                <div className="loader" />
+       <Web3Provider>
+            <UserProvider>
+            <div>
+                <div id="preloder">
+                    <div className="loader" />
+                </div>
+                <div className="humberger__menu__overlay" />
+                <TopBar></TopBar>
+                
+                <Header cartItems={cartItems}></Header>
+                <SideBarCategory></SideBarCategory>
+                <Outlet></Outlet>
+                <Footer></Footer>
             </div>
-            <div className="humberger__menu__overlay" />
-            <TopBar></TopBar>
-            
-            <Header cartItems={cartItems}></Header>
-            <SideBarCategory></SideBarCategory>
-            <Outlet></Outlet>
-            <Footer></Footer>
-        </div>
-       </>
+            </UserProvider>
+       </Web3Provider>
     )
 }
 

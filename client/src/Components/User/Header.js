@@ -1,9 +1,11 @@
 import React ,{useEffect,useState} from "react";
 import logo from '../../Resource/UserInterface/img/logo.png';
 import { Link,NavLink} from "react-router-dom";
+import { useUser } from "../../Providers";
 const Header = ({cartItems}) =>{
     const subTotal = cartItems.reduce((total,item)=>total+ item.price * item.quantity,0);
     const [active, setActive] = useState(false);
+    const { user } = useUser();
     useEffect(() => {
         return () => {
             setActive(false);
@@ -41,8 +43,9 @@ const Header = ({cartItems}) =>{
                         </ul>
                     </div>
                     <div className="header__top__right__auth">
-                        <Link to="/login"><i className="fa fa-user" /> Login</Link>
-                        
+                        {
+                           user ?  ( <Link to="/"><i className="fa fa-user" /> { user.name} </Link>) : ( <Link to="/login"><i className="fa fa-user" /> Login</Link>)
+                        }                       
                     </div>
                     </div>
                 </div>

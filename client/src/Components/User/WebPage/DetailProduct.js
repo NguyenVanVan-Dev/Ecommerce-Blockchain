@@ -1,7 +1,6 @@
 import React ,{useLayoutEffect, useState,useEffect} from "react";
 import {Link,useParams} from "react-router-dom";
 import Notiflix from 'notiflix';
-import $ from 'jquery';
 import OwlCarousel from 'react-owl-carousel';
 import productApi from '../../../Api/productApi'
 function DetailProduct({handleAddCart,setCartItems}) {
@@ -22,15 +21,17 @@ function DetailProduct({handleAddCart,setCartItems}) {
                 productApi.getAll(params).then((result) => {
                     setRelatedProduct(result.products);
                     setDetailProduct(data.product);
-                    $('.set-bg').each(function () {
-                        var bg = $(this).data('setbg');
-                        $(this).css('background-image', 'url(' + bg + ')');
-                    });
+                    
                 })
             })
             .catch((err) => {
                 Notiflix.Report.failure("Product Detail",err.message, 'Cancel');
             })
+        }
+        const setBg = document.querySelectorAll('.set-bg');
+        for (const item of setBg) {
+            let bg = item.getAttribute('data-setbg');
+            item.style.backgroundImage = `url('${bg}')`;
         }
         getProduct();
        
