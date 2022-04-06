@@ -2,6 +2,7 @@ import React ,{useEffect,useState} from "react";
 import logo from '../../Resource/UserInterface/img/logo.png';
 import { Link,NavLink} from "react-router-dom";
 import { useUser } from "../../Providers";
+import NavbarTop from "./NavbarTop";
 const Header = ({cartItems}) =>{
     const subTotal = cartItems.reduce((total,item)=>total+ item.price * item.quantity,0);
     const [active, setActive] = useState(false);
@@ -61,29 +62,7 @@ const Header = ({cartItems}) =>{
                 </div>
                 <div className="col-lg-6">
                 <nav className="header__menu">
-                    <ul>
-                    <li >
-                        <NavLink to="/" className={(navData) => (navData.isActive ? 'active' : 'link')} >Home</NavLink>
-                        {/* <Link to="/">Home</Link> */}
-                    </li>
-                    <li><a href="./shop-grid.html">Shop</a></li>
-                    <li className={active ? "active" : "link"}><a href="#">Pages</a>
-                        <ul className="header__menu__dropdown">
-                        <li><a href="./shop-details.html">Shop Details</a></li>
-                        <li>
-                            <NavLink to="/cart" className={(navData) => (navData.isActive ? setActive(true) : 'link')}>Shoping Cart</NavLink>
-                            {/* <Link to="/cart">Shoping Cart</Link> */}
-                        </li>
-                        <li>
-                            {/* <Link to={`/checkout`}>Check Out</Link> */}
-                            <NavLink to={`/checkout`} className={(navData) => (navData.isActive ? setActive(true) : 'link')}>Check Out</NavLink>
-                        </li>
-                        <li><a href="./blog-details.html">Blog Details</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="./blog.html">Blog</a></li>
-                    <li><a href="./contact.html">Contact</a></li>
-                    </ul>
+                    <NavbarTop></NavbarTop>
                 </nav>
                 </div>
                 <div className="col-lg-3">
