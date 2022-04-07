@@ -3,7 +3,6 @@ import OwlCarousel from 'react-owl-carousel';
 import axios from "axios";
 import Notiflix from 'notiflix';
 import { Link } from "react-router-dom";
-
 const LastestSlideProduct = () => {
     const [latestProducts,setLatestProducts] = useState();
     const [topRateProducts,setTopRateProducts] = useState();
@@ -34,38 +33,22 @@ const LastestSlideProduct = () => {
             <div className="container">
                 <div className="row">
                     <div className="col-lg-4 col-md-6"> 
-                    <div className="latest-product__text">
-                        <h4>Latest Products</h4>
-                        {
-                            latestProducts && <OwlCarousel className="latest-product__slider owl-carousel"
-                                        loop 
-                                        margin={10} 
-                                        nav
-                                        items="1"
-                                        autoplay
-                                        animateOut={"fadeOut"}
-                                        smartSpeed= "1200"
-                                    
-                                    >
-                                        <div className="latest-prdouct__slider__item">
-                                            {
-                                                latestProducts.listOne.map((product)=>{
-                                                    let price = product.price;
-                                                    return ( <Link key={product._id} to={`product/${product._id}`} className="latest-product__item">
-                                                                <div className="latest-product__item__pic">
-                                                                    <img src={`uploads/${product.image}`} alt="" />
-                                                                </div>
-                                                                <div className="latest-product__item__text">
-                                                                    <h6>{product.name}</h6>
-                                                                    <span>{price.toLocaleString('vi-VN', {style: 'currency',currency: 'VND'})}</span>
-                                                                </div>
-                                                            </Link>)
-                                                })
-                                            }
-                                        </div>
-                                        <div className="latest-prdouct__slider__item">
+                        <div className="latest-product__text">
+                            <h4>Latest Products</h4>
+                            {
+                            latestProducts 
+                            && <OwlCarousel className="latest-product__slider owl-carousel"
+                                loop 
+                                margin={10} 
+                                nav
+                                items="1"
+                                autoplay
+                                animateOut={"fadeOut"}
+                                smartSpeed= "1200"    
+                                >
+                                    <div className="latest-prdouct__slider__item">
                                         {
-                                            latestProducts.listTwo.map((product)=>{
+                                            latestProducts.listOne.map((product)=>{
                                                 let price = product.price;
                                                 return ( <Link key={product._id} to={`product/${product._id}`} className="latest-product__item">
                                                             <div className="latest-product__item__pic">
@@ -78,10 +61,26 @@ const LastestSlideProduct = () => {
                                                         </Link>)
                                             })
                                         }
-                                        </div>
-                                     </OwlCarousel>
-                        }
-                    </div>
+                                    </div>
+                                    <div className="latest-prdouct__slider__item">
+                                    {
+                                        latestProducts.listTwo.map((product)=>{
+                                            let price = product.price;
+                                            return ( <Link key={product._id} to={`product/${product._id}`} className="latest-product__item">
+                                                        <div className="latest-product__item__pic">
+                                                            <img src={`uploads/${product.image}`} alt="" />
+                                                        </div>
+                                                        <div className="latest-product__item__text">
+                                                            <h6>{product.name}</h6>
+                                                            <span>{price.toLocaleString('vi-VN', {style: 'currency',currency: 'VND'})}</span>
+                                                        </div>
+                                                    </Link>)
+                                        })
+                                    }
+                                    </div>
+                                </OwlCarousel>
+                            }
+                        </div>
                     </div>
                     <div className="col-lg-4 col-md-6">
                     <div className="latest-product__text">

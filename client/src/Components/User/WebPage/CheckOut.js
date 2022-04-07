@@ -33,6 +33,11 @@ function CheckOut({cartItems,setCartItems}) {
                 setPriceETH(data.VND)
             });
         }
+        const setBg = document.querySelectorAll('.set-bg');
+        setBg.forEach((item) => {
+            let bg = item.getAttribute('data-setbg');
+            item.style.backgroundImage = `url('${bg}')`;
+        })
         getPriceEth();
     }, []);
     const priceTotalETH =(subTotal / parseFloat(priceETH)).toFixed(10);

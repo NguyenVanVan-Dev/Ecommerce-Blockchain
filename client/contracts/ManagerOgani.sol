@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
+import "./Ownable.sol";
 
-contract ManagerOgani {
+contract ManagerOgani is Ownable {
     uint256 public transactionCount;
     uint256 public orderNumber;
     mapping (uint => PaymentObject) public listPayments;
@@ -71,7 +72,7 @@ contract ManagerOgani {
     }
    
     
-    function transferToSupplier(string memory _idProduct, address _supplier) public payable {
+    function transferToSupplier(string memory _idProduct, address _supplier) public payable includeManagementList(msg.sender) {
         listPayments[transactionCount] = PaymentObject(_idProduct,msg.value,_supplier,msg.sender);
         transactionCount++;
         payable(_supplier).transfer(msg.value);
@@ -84,7 +85,7 @@ contract ManagerOgani {
         }
         return listTransaction[index];
     }
-    function getAllTransaction () public view returns (PaymentObject[] memory){
+    function getAllTransaction () external view returns (PaymentObject[] memory){
         PaymentObject[]  memory listTransaction = new PaymentObject[](transactionCount);
         for (uint i = 0; i < transactionCount; i++) {
             PaymentObject storage currentObject = listPayments[i];

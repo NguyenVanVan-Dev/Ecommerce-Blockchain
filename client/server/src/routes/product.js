@@ -17,7 +17,7 @@ router.post('/store',authMiddleware,async (req,res, next)=>{
     });
 },productController.store);
 router.get('/show',productController.show);
-router.get('/detail',authMiddleware,productController.detail);
+router.get('/detail',productController.detail);
 router.put('/update',authMiddleware,async (req,res, next)=>{
     Uploadfile('new_image')(req, res, function (err) {
         if (err) {
