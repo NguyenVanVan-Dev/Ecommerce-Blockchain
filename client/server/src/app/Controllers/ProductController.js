@@ -86,7 +86,7 @@ class ProductController {
                         products = await productModle.find({type_display: 1 , display: 1, category_id:category_id, _id: { "$ne": product_id }}).sort({ createdAt: -1 }).limit(8);
                         break; 
                     default:
-                        products = await productModle.find({display: 1});
+                        products = await productModle.find({display: 1}).sort({ createdAt: -1 });
                         break;
                 }
             }

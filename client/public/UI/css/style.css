@@ -1295,6 +1295,7 @@ input::-webkit-inner-spin-button {
 	height: 270px;
 	position: relative;
 	overflow: hidden;
+	background-color: #F5F5F5;
 }
 
 .product__discount__item__pic .product__discount__percent {

@@ -24,6 +24,7 @@ import ListContract from "./Components/Manage/Webpage/Contract/ListContract";
 import CheckOut from "./Components/User/WebPage/CheckOut";
 import DetailProductUser from "./Components/User/WebPage/DetailProduct";
 import LoginUser from "./Components/User/WebPage/Login";
+import Shop from "./Components/User/WebPage/Shop"
 axios.defaults.baseURL = 'http://localhost:2105/';
 axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
 axios.defaults.headers.post['Accept'] = 'application / json';
@@ -71,6 +72,7 @@ function App() {
                 <Route path="checkout" element={<CheckOut setCartItems={setCartItems} cartItems={cartItems}/>} />
                 <Route path="product/:id" element={<DetailProductUser handleAddCart={handleAddCart}/>} />
                 <Route path="login" element={<LoginUser/>} />
+                <Route path="shop" element={<Shop/>} />
                 <Route path="/" element={<Home handleAddCart={handleAddCart}  />} />
             </Route>
             <Route path="/admin/login" element = {<Login/>} />
