@@ -22,6 +22,7 @@ function AddProduct() {
         category_id:0,
         display:1,
         type_display:1,
+        sale_of:'',
         wallet:'',
         error_list:{},
     })
@@ -238,9 +239,13 @@ function AddProduct() {
                                             <input type="text" onChange={handleInput} value={productInput.name} name="name" className="form-control form-control-user" id="exampleFirstName" placeholder="Product Name" />
                                             <span className="text-danger small">{productInput.error_list.name}</span>
                                         </div>
-                                        <div className="col-sm-6">
+                                        <div className="col-sm-3">
                                             <input type="text" onChange={handleInput} value={productInput.slug} name="slug" className="form-control form-control-user"  placeholder="Product Slug" />
                                             <span className="text-danger small">{productInput.error_list.slug}</span>
+                                        </div>
+                                        <div className="col-sm-3">
+                                            <input type="number" onChange={handleInput} value={productInput.sale_of} name="sale_of" className="form-control form-control-user " id="exampleInputPassword" placeholder="Sale Of (%)" />
+                                            <span className="text-danger small">{productInput.error_list.sale_of}</span>
                                         </div>
                                     </div>
                                     <div className="form-group row">

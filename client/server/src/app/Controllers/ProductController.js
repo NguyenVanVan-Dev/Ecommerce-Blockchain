@@ -9,7 +9,7 @@ class ProductController {
     //[POST] /product/store
     async store(req, res){
         let listError = {};
-        const {name, keyword, desc,display,slug,category_id,price,qty,type_display,wallet} = req.body;
+        const {name, keyword, desc,display,slug,category_id,price,qty,type_display,sale_of,wallet} = req.body;
         const productSave  = new productModle({ 
                 name,
                 keyword,
@@ -21,6 +21,7 @@ class ProductController {
                 qty,
                 wallet,
                 type_display,
+                sale_of,
                 image: req.file ? req.file.filename : ''
         });
         await productSave.save()
@@ -50,11 +51,10 @@ class ProductController {
     }
      //[GET] /product/show
     async show(req,res){
-        let whoCall = req.query.whoCall;
-        let type =req.query.type;
-        let category_id =req.query.category_id;
-        let product_id =req.query.product_id;
+        const {whoCall,type,category_id,product_id,page,limit} = req.query
+        let pagination = {} ;
         let products = {} ;
+        let totalRows= 0;
         let listOne;
         let listTwo;
         try {
@@ -83,7 +83,21 @@ class ProductController {
                         }
                         break;    
                     case 'related-product':
-                        products = await productModle.find({type_display: 1 , display: 1, category_id:category_id, _id: { "$ne": product_id }}).sort({ createdAt: -1 }).limit(8);
+                        products = await productModle.find({ display: 1, category_id:category_id, _id: { "$ne": product_id }}).sort({ createdAt: -1 }).limit(8);
+                        break; 
+                    case 'sale-of':
+                        products = await productModle.find({ display: 1, sale_of:{$gt:0}}).sort({ createdAt: -1 }).limit(8);
+                        break; 
+                    case 'normal':
+                        
+                        products = await productModle.find({display: 1, sale_of: 0 }).sort({ createdAt: -1 }).skip((page-1)*limit).limit(limit);
+                        totalRows = await productModle.find({display: 1, sale_of: 0 });
+                        pagination ={
+                            page,
+                            limit,
+                            totalRows: totalRows.length
+                        }
+                        console.log(typeof page);
                         break; 
                     default:
                         products = await productModle.find({display: 1}).sort({ createdAt: -1 });
@@ -91,10 +105,9 @@ class ProductController {
                 }
             }
             if(products){
-                res.status(200).json({success:true,products});
+                res.status(200).json({success:true,products,pagination});
             }
         } catch (error) {
-            console.log(error)
             res.status(500).json({success:false,error});
         }
     }

@@ -42,6 +42,10 @@ const productSchema = new Schema({
         type:Number,
         default:1
     },
+    sale_of:{
+        type:Number,
+        default: 0
+    },
     wallet:{
         type:String,
         required:[true,'Please select supplier for Product!']
