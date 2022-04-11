@@ -630,6 +630,12 @@ input::-webkit-inner-spin-button {
 	padding-left: 40px;
 	padding-top: 10px;
 	padding-bottom: 12px;
+	position: absolute;
+    left: 0;
+    top: 46px;
+    width: 100%;
+    z-index: 9;
+    background: #ffffff;
 }
 
 .hero__categories ul li {

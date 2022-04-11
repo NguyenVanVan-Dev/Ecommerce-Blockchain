@@ -17,6 +17,7 @@ function ListProduct() {
                     if(res.success === true){
                         setProducts(res.products)
                     }
+                    Notiflix.Loading.remove(500);
                 })
                 .catch((err)=>{
                     console.log(err)
@@ -25,9 +26,17 @@ function ListProduct() {
             } catch (error) {
                 console.log(error)
             }
+            console.log('render')
         }
-       fetchProductlist();
+        fetchProductlist();
+        return () => {
+            console.log('clear');
+        }
     }, []);
+    Notiflix.Loading.hourglass("Loading data...",{
+        clickToClose: true,
+        svgSize: '120px',
+    });
     const handleRemoveProduct = async (id) => {
         const params = {id}
         await productApi.delete(params)
@@ -109,7 +118,7 @@ function ListProduct() {
                                                     <td>{product.price}</td>
                                                     <td>{product.qty}</td>
                                                     
-                                                    <td>{product.category_id}</td>
+                                                    <td>{product.category_id.name}</td>
                                                     <td>{ type_display}</td>
                                                     <td>
                                                         <Link to={'/admin/product/'+product._id} className="btn btn-info mr-1 mb-1"><i className="fas fa-edit"></i></Link>

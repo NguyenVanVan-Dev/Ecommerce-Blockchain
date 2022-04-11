@@ -38,6 +38,10 @@ function CheckOut({cartItems,setCartItems}) {
             let bg = item.getAttribute('data-setbg');
             item.style.backgroundImage = `url('${bg}')`;
         })
+        let hero__item = document.querySelector(".hero__item");
+        hero__item.style.display = 'none';
+        let hero__categories = document.querySelector(".hero__categories ul");
+        hero__categories.style.display = 'none';
         getPriceEth();
     }, []);
     const priceTotalETH =(subTotal / parseFloat(priceETH)).toFixed(10);

@@ -8,6 +8,10 @@ const Cart = ({cartItems,setCartItems}) => {
             var bg = $(this).data('setbg');
             $(this).css('background-image', 'url(' + bg + ')');
         });
+        let hero__item = document.querySelector(".hero__item");
+        hero__item.style.display = 'none';
+        let hero__categories = document.querySelector(".hero__categories ul");
+        hero__categories.style.display = 'none';
     });
     const handleQty = (e,id)=>{
         setCartItems(prev => {

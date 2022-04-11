@@ -50,6 +50,7 @@ function DetailProduct() {
                             price:res.product.price,
                             qty:res.product.qty,
                             category_id:res.product.category_id,
+                            sale_of:res.product.sale_of,
                             image:res.product.image,
                             type_display:res.product.type_display,
                             error_list:[],
@@ -85,6 +86,10 @@ function DetailProduct() {
 	};
     const handelSubmit = async (e)=>{
         e.preventDefault();
+        Notiflix.Loading.hourglass("Loading data! Please wait...",{
+            clickToClose: true,
+            svgSize: '120px',
+        });
         const formData = new FormData();
         for (const property in productInput) {
             formData.append(property, productInput[property]);
@@ -96,7 +101,10 @@ function DetailProduct() {
         .then(res =>{
             if(res.success === true)
             {
-                Notiflix.Report.success(res.message,"Product has been updated to the database" , 'Cancel');
+                Notiflix.Loading.remove(1000);
+                setTimeout(() => {
+                    Notiflix.Notify.success("Product has been updated to the database");
+                }, 1200);
             }
         }).catch((error)=>{
             if(error.response.data.error){
@@ -197,7 +205,7 @@ function DetailProduct() {
                                                 <option value={0} className="optionform">---Chose Category---</option>
                                                 {categories ? categories.map((category)=>{
                                                     return (
-                                                        <option key={category._id} value={category.slug} className="optionform">{category.name}</option>
+                                                        <option key={category._id} value={category._id} className="optionform">{category.name}</option>
                                                     )
                                                 }) : ''}
                                                 

@@ -30,6 +30,7 @@ router.put('/update',authMiddleware,async (req,res, next)=>{
         next();
     });
 },productController.update);
+router.get('/populate',productController.populateData);
 router.delete('/delete',authMiddleware,productController.delete);
 
 

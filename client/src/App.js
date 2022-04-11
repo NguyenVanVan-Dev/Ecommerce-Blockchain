@@ -25,6 +25,7 @@ import CheckOut from "./Components/User/WebPage/CheckOut";
 import DetailProductUser from "./Components/User/WebPage/DetailProduct";
 import LoginUser from "./Components/User/WebPage/Login";
 import Shop from "./Components/User/WebPage/Shop"
+import Notiflix from "notiflix";
 axios.defaults.baseURL = 'http://localhost:2105/';
 axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
 axios.defaults.headers.post['Accept'] = 'application / json';
@@ -44,6 +45,7 @@ function App() {
         return storageCart ?? [];
     });
     const handleAddCart = (product,quantity = 1) =>{
+      
         const ProductExits = cartItems.find((item)=> item._id === product._id);
         if(ProductExits)
         {
@@ -61,7 +63,7 @@ function App() {
                 return newCart;
             });
         }
-        
+        Notiflix.Notify.success("Add product to cart");
     }
    
     return (

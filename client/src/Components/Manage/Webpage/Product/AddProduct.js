@@ -103,6 +103,7 @@ function AddProduct() {
                 value:amount
             })
             .then((_transfer)=>{
+                Notiflix.Loading.remove(500);
                 setProductInput({name:'',desc:'',slug:'',keyword:'',price:'',qty:'',image:'',category_id:0,display:1,type_display:1,wallet:'',error_list:[],});
             })
             .catch((err)=>{
@@ -141,6 +142,9 @@ function AddProduct() {
 	};
     const handelSubmit = (e)=>{
         e.preventDefault();
+        Notiflix.Loading.hourglass("Processing data! Please wait...",{
+            svgSize: '120px',
+        });
         if(!account){
             provider.request({ method:'eth_requestAccounts'})
                             .then((result)=>{
@@ -293,7 +297,7 @@ function AddProduct() {
                                                 <option value={0} className="optionform">---Chose Category---</option>
                                                 {categories ? categories.map((category)=>{
                                                     return (
-                                                        <option key={category._id} value={category.slug} className="optionform">{category.name}</option>
+                                                        <option key={category._id} value={category._id} className="optionform">{category.name}</option>
                                                     )
                                                 }) : ''}
                                             </select>

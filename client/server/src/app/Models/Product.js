@@ -32,6 +32,7 @@ const productSchema = new Schema({
     },
     category_id:{
         type: String,
+        ref: 'category',
         default: 1,
     },
     image:{

@@ -25,7 +25,7 @@ const SideBarCategory = () =>{
             <div className="container">
             <div className="row">
                 <div className="col-lg-3">
-                <div className="hero__categories">
+                <div className="hero__categories" style={{position: 'relative'}}>
                     <div className="hero__categories__all">
                     <i className="fa fa-bars" />
                     <span>All departments</span>

@@ -2,12 +2,13 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const orderItemSchema = new Schema({
     orderID: { 
-        type: String, 
-        required:[true , 'Please enter your orderID!' ]
+        type: String,
+        ref:'order',
+        required:[true , 'Please enter your orderID!' ],
     }, 
     productID:{
         type: String,
-        max:255,
+        ref:'product',
         required:[true , 'Please enter your productID!' ]
     },
     qty:{

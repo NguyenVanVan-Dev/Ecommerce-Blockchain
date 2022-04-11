@@ -38,6 +38,17 @@ class CheckoutController {
                 });
                 return false;
     }
+
+    async populateData(req,res){
+        let products = {} ;
+        products = await OrderItems.find()
+        .populate('orderID')
+        .populate('productID')
+        .sort({ createdAt: 1 }).limit(3);
+        if(products){
+            res.status(200).json({success:true,products});
+        }
+    }
 }
 
 module.exports = new CheckoutController;

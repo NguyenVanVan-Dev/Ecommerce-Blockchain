@@ -59,24 +59,24 @@ class ProductController {
         let listTwo;
         try {
             if(whoCall == 'admin'){
-                products = await productModle.find().sort({ createdAt: -1 });
+                products = await productModle.find().populate('category_id').sort({ createdAt: -1 });
             }else 
             {
                 switch (type) {
                     case 'featured':
-                        products = await productModle.find({type_display: 1 , display: 1}).sort({ createdAt: -1 }).limit(12);
+                        products = await productModle.find({type_display: 1 , display: 1}).populate('category_id').sort({ createdAt: -1 }).limit(12);
                         break;
                     case 'latest':
-                         listOne = await productModle.find({type_display: 2 , display: 1}).sort({ createdAt: -1 }).limit(3);
-                         listTwo = await productModle.find({type_display: 2 , display: 1}).sort({ createdAt: -1 }).skip(3).limit(3);
+                        listOne = await productModle.find({type_display: 2 , display: 1}).sort({ createdAt: -1 }).limit(3);
+                        listTwo = await productModle.find({type_display: 2 , display: 1}).sort({ createdAt: -1 }).skip(3).limit(3);
                         products = {
                             listOne,
                             listTwo
                         }
                         break;
                     case 'top-rated':
-                         listOne = await productModle.find({type_display: 3 , display: 1}).sort({ createdAt: -1 }).limit(3);
-                         listTwo = await productModle.find({type_display: 3 , display: 1}).sort({ createdAt: -1 }).skip(3).limit(3);
+                        listOne = await productModle.find({type_display: 3 , display: 1}).sort({ createdAt: -1 }).limit(3);
+                        listTwo = await productModle.find({type_display: 3 , display: 1}).sort({ createdAt: -1 }).skip(3).limit(3);
                         products = {
                             listOne,
                             listTwo
@@ -89,7 +89,6 @@ class ProductController {
                         products = await productModle.find({ display: 1, sale_of:{$gt:0}}).sort({ createdAt: -1 }).limit(8);
                         break; 
                     case 'normal':
-                        
                         products = await productModle.find({display: 1, sale_of: 0 }).sort({ createdAt: -1 }).skip((page-1)*limit).limit(limit);
                         totalRows = await productModle.find({display: 1, sale_of: 0 });
                         pagination ={
@@ -173,6 +172,16 @@ class ProductController {
             });
         } catch (error) {
             res.status(500).json({success:false,message: error.message})
+        }
+    }
+
+    async populateData(req,res){
+        let products = {} ;
+        products = await productModle.find({type_display:4})
+        .populate('category_id')
+        .sort({ createdAt: 1 }).limit(3);
+        if(products){
+            res.status(200).json({success:true,products});
         }
     }
 }
